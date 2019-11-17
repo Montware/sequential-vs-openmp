@@ -155,7 +155,7 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
                    unsigned int iteration){
     /* Preparación para la escritura del archivo */
     ofstream initconf;
-    initconf.open (step_file_path, ios::out | ios::binary);
+    initconf.open (step_file_path, ios::out | ios::app | ios::binary);
     initconf << std::fixed;
     initconf << std::setprecision(3);
 

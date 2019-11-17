@@ -7,6 +7,10 @@
 # numPlanetas = 8;
 # semilla = 100;
 
+if [ -f "stepbystep" ]; then
+    rm -f stepbystep
+fi  
+
 clear
 
 printf "\nCompilando programa\n"  
