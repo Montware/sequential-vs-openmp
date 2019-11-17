@@ -6,7 +6,7 @@
 /* Constantes predefinidas de la simulación */
 #define GRAVITY 6.674E-5
 #define PERIODO 0.1
-#define DISTMIN 5.0      // TODO: Borrar
+#define DISTMIN 5.0
 #define ANCHURA 200
 #define ALTURA 200
 #define MEDIADISTRIBUCIONMASAS 1000
@@ -16,9 +16,8 @@
 
 using namespace std;
 
-/* TODO: Revisar saltos de línea para no salirse d elos márgenes con líneas muy largas */
 
-// Declaración de funciones
+/* Declaración de funciones */
 vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem);
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
@@ -38,7 +37,6 @@ Asteroide* clonar_asteroide(const Asteroide& orig);
 
 /* Funciones para generacion automática de valores (en base a una distribución y desviación)
     de posicion (coordenadas X e Y) dentro de las dimensiones (200x200) del escenario de simulación.
-
 */
 uniform_real_distribution<double> xdist(0.0, std::nextafter(ANCHURA,
                                         std::numeric_limits<double>::max()));
@@ -123,9 +121,8 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
                    unsigned int num_asteroides, unsigned int num_iteraciones,
                    unsigned int num_planetas, unsigned int semilla){
     /* Preparación para la escritura del archivo */
-    /* TODO: Revisar los parámetros de .open y los std:: */
     ofstream initconf;
-    initconf.open (init_file_path, ios::out | ios::app | ios::binary);          // TODO: Revisar si ios:app es conveniente o mejor no hacer append
+    initconf.open (init_file_path, ios::out | ios::binary);
     initconf << std::fixed;
     initconf << std::setprecision(3);
 
@@ -157,9 +154,8 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
 void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int iteration){
     /* Preparación para la escritura del archivo */
-    /* TODO: Revisar los parámetros de .open y los std:: */
     ofstream initconf;
-    initconf.open (step_file_path, ios::out | ios::app | ios::binary);
+    initconf.open (step_file_path, ios::out | ios::binary);
     initconf << std::fixed;
     initconf << std::setprecision(3);
 
@@ -179,7 +175,6 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
         /* Escritura de asteroide vs planetas */
         initconf << "--- asteroid " << i << " vs planets ---\n";
         for(size_t j = 0; j <= planetas.size() - 1; ++j){
-            // TODO: Revisar qué fuerza/s hay que guardar en el archivo step_by_Step
            initconf << i << " " << j << " " << asteroide.get_fuerzas_x()[j + asteroides.size()] <<
            " " << asteroide.get_ang_influencia()[j + asteroides.size()] << "\n";
         }
@@ -194,9 +189,8 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
 */
 void gen_out_file(string out_file_path, vector<Asteroide> asteroides){
     /* Preparación para la escritura del archivo */
-    /* TODO: Revisar los parámetros de .open y los std:: */
     ofstream initconf;
-    initconf.open (out_file_path, ios::out | ios::app | ios::binary);          // TODO: Revisar si ios:app es conveniente o mejor no hacer append
+    initconf.open (out_file_path, ios::out | ios::binary);
     initconf << std::fixed;
     initconf << std::setprecision(3);
 
@@ -244,9 +238,6 @@ void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<
 */
 void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas){
     vector<double> pendiente = asteroide.get_pendiente();
-    //vector<double> ang_influencia = asteroide.get_ang_influencia();       // TODO: Borrar
-    //vector<double> dists_asteroides = asteroide.get_dist_asteroides();
-    //vector<double> dists_planetas = asteroide.get_dist_planetas();
 
     /* Reset de movimientos normales*/
     asteroide.clear_movs_normales();
@@ -261,16 +252,14 @@ void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vect
             (asteroide.get_pos_x() - asteroides[i].get_pos_x());
             
             /* Correción antes de almacenar */
-            //if (pendiente_gen > 1 || pendiente_gen < -1){     TODO: Borrar
             if (pendiente_gen > 1){
-                //pendiente_gen = pendiente_gen - ((int) pendiente_gen / 1);    TODO: Borrar
                 pendiente_gen = 1;
             } else if (pendiente_gen < -1){
                 pendiente_gen = -1;
             }
 
             /* Comprobamos que es un número correcto */
-            if(isnan(pendiente_gen) > 0){         // TODO: Revisar qué es "isnan". Ver si es necesario este if
+            if(isnan(pendiente_gen) > 0){
                 pendiente_gen = 0.0;
             }
             asteroide.add_pendiente(pendiente_gen);
@@ -289,16 +278,14 @@ void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vect
             (asteroide.get_pos_x() - planetas[i].get_pos_x());
             
             /* Correción antes de almacenar */
-            //if (pendiente_gen2 > 1 || pendiente_gen2 < -1){       TODO: Borrar
             if (pendiente_gen2 > 1){
-                //pendiente_gen2 = pendiente_gen2 - ((int) pendiente_gen2 / 1);     TODO: Borrar
                 pendiente_gen2 = 1;
             } else if (pendiente_gen2 < -1){
                 pendiente_gen2 = -1;
             }
 
             /* Comprobamos que es un número */
-            if(isnan(pendiente_gen2) > 0){         // TODO: Revisar qué es "isnan". Ver si es necesario este if
+            if(isnan(pendiente_gen2) > 0){
                 pendiente_gen2 = 0.0;
             }
 
@@ -327,7 +314,6 @@ void calc_fuerzas_x(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
     asteroide.clear_fuerzas_x();
 
     /* Cálculo de componentes X de la fuerza de atracción sobre un asteroide ejercida por los demás */
-    //for(size_t i = 0; i <= dist_asteroide.size() - 1; ++i){       // TODO: Borrar
     for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i){
         double fuerza_x;
 
@@ -377,7 +363,6 @@ void calc_fuerzas_y(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
     asteroide.clear_fuerzas_y();
 
     /* Cálculo de componentes Y de la fuerza de atracción sobre un asteroide ejercida por los demás */
-    //for(size_t i = 0; i <= dist_asteroide.size() - 1; ++i){       // TODO: Borrar
     for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i){       
         double fuerza_y;
 
@@ -419,7 +404,6 @@ void calc_fuerzas_y(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
 void calc_mov_asteroide(Asteroide& asteroide){
     vector<double> fuerzas_x = asteroide.get_fuerzas_x();
     vector<double> fuerzas_y = asteroide.get_fuerzas_y();
-    //vector<double> ang_influencia = asteroide.get_ang_influencia();       // TODO: Borrar
 
     /* Reset de fuerzas totales */
     asteroide.set_fuerza_tot_x(0.0);
@@ -446,11 +430,11 @@ void calc_mov_asteroide(Asteroide& asteroide){
     double acel_y = asteroide.get_acel_y();
 
     /* Cálculo de la velocidad */
-    /* Cálculo de la velocidad X*/
+    /* Cálculo de la velocidad X */
     double velx = asteroide.get_vel_x();
     velx = velx + acel_x * PERIODO;
 
-    /* Cálculo de la velocidad Y*/
+    /* Cálculo de la velocidad Y */
     double vely = asteroide.get_vel_y();
     vely = vely + acel_y * PERIODO;
 
@@ -458,24 +442,17 @@ void calc_mov_asteroide(Asteroide& asteroide){
     asteroide.set_vel_y(vely);
 
     /* Cálculo de la posición */
-    /* Cálculo de la posición X*/
+    /* Cálculo de la posición X */
     double pos_x = asteroide.get_pos_x();
     pos_x = pos_x + velx * PERIODO;
 
-    /* Cálculo de la posición Y*/
+    /* Cálculo de la posición Y */
     double pos_y = asteroide.get_pos_y();
     pos_y = pos_y + vely * PERIODO;
 
     asteroide.set_pos_x(pos_x);
     asteroide.set_pos_y(pos_y);
 }
-
-
-// TODO: Dividir funciónde cálculo de movimiento para sacar fuera el cálculo de aceleración y de velocidad
-/* Cálculo de aceleración */
-
-/* Cálculo de velocidad */
-
 
 
 /* Cálculo de rebote de un asteroide con la pared.
@@ -488,25 +465,23 @@ void calc_rebote_pared(Asteroide& asteroide){
 
     /* Cuando un el asteroide está a menos de la distancia mínima de los bordes, sale rebotado
         cambiando el signo de su velocidad */
-    // TODO: Revisar si cuando posx <= 0 o posx <= DISTMIN o posx <= 2 y lo mismo en los demas laterales
-    // TODO: En caso de ser <= DISTMIN, borrar sentencias asteroide.set_pos_x(DISTMIN);
     if(pos_x <= 0)
     {
-        asteroide.set_pos_x(DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
+        asteroide.set_pos_x(DISTMIN);
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
     } else if (pos_y <= 0)
     {
-        asteroide.set_pos_y(DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
+        asteroide.set_pos_y(DISTMIN);
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
 
     } else if (pos_x >= ANCHURA)
     {
-        asteroide.set_pos_x(ANCHURA - DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
+        asteroide.set_pos_x(ANCHURA - DISTMIN);
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
 
     } else if (pos_y >= ALTURA)
     {
-        asteroide.set_pos_y(ALTURA - DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
+        asteroide.set_pos_y(ALTURA - DISTMIN);
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
     }
 }
@@ -526,7 +501,7 @@ void calc_rebote_asteroides(vector<Asteroide> asteroides){
         asteroides_temp_copy.push_back(*asteroide_temp);
     }
 
-    /* Cálculo de intercambio de velocidades de los asteroides si estos rebotan (dist <= DISTMN */  // TODO: Revisar que es <= que DISTIM y no 0 o 2
+    /* Cálculo de intercambio de velocidades de los asteroides si estos rebotan (dist <= DISTMIN) */
     for(size_t i = 0; i <= asteroides.size() - 1; ++i){
 
         for(size_t j = 0; j <= asteroides_temp_copy.size() - 1; ++j){
@@ -538,8 +513,8 @@ void calc_rebote_asteroides(vector<Asteroide> asteroides){
                 cout << "REBOTE ENTRE ASTEROIDES " << i << " con pos " << asteroides[i].get_pos_x() <<
                 ", " << asteroides[i].get_pos_y() << " y " << j << " con pos " <<
                 asteroides_temp_copy[j].get_pos_x() << ", " << asteroides_temp_copy[j].get_pos_y() << endl;
+
                 /* Intercambio de velocidades*/
-                // TODO: Revisar con la especificacion/enunciado que el cambio de velocidades está bien hecho (si es cruzado o no)
                 asteroides[i].set_vel_x(-1 * asteroides_temp_copy[j].get_vel_x());
                 asteroides[i].set_vel_y(-1 * asteroides_temp_copy[j].get_vel_y());
             }

@@ -3,6 +3,7 @@
         "cmath": "cpp",
         "iomanip": "cpp",
         "iostream": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "iosfwd": "cpp"
     }
 }
