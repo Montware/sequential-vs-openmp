@@ -28,12 +28,18 @@ using namespace std::chrono;
 #define INITFILE "init_conf.txt"
 #define STEPSFILE "stepbystep.txt"
 #define OUTFILE "out.txt"
+#define TESTFILE "tests.csv"
+
+
 
 /* Ejecución principal */
 int main(int argc, char const *argv[])
 {
-    cout << "Ejecutando nasteroides-seq" << endl;
+    cout << "Ejecutando nasteroides-seq no optimizado" << endl;
     int num_iteraciones;
+    int num_asteroides;
+    int num_planetas;
+
 
     /* Inicio del temportizador para métrica de tiempo del programa*/
     high_resolution_clock::time_point program_start_time = high_resolution_clock::now();
@@ -50,9 +56,9 @@ int main(int argc, char const *argv[])
         exit(EXIT_FAILURE);
     } else {
         /* Obtenemos los parámetros introducidos */
-        int num_asteroides = stoi(argv[1]);
+        num_asteroides = stoi(argv[1]);
         num_iteraciones = stoi(argv[2]);
-        int num_planetas = stoi(argv[3]);
+        num_planetas = stoi(argv[3]);
         int semilla = stoi(argv[4]);
 
         /* Comprobamos ningún parámetro es negativo o semilla no positiva */
@@ -111,5 +117,10 @@ int main(int argc, char const *argv[])
     duration<double> duracion_ejecucion = duration_cast<duration<double>>(program_end_time - program_start_time);
     cout << "Tiempo total de ejecucion = " << duracion_ejecucion.count() << " segundos" << endl;
 
+    /* Almacenamiento de tiempos para los tests de evaluación con métrica */
+    gen_test_file(TESTFILE, num_iteraciones, num_asteroides, num_planetas, duracion_ejecucion, duracion_media_iteracion);
+
     return 0;
 }
+
+

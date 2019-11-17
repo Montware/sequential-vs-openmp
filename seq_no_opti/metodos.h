@@ -2,6 +2,9 @@
 #include <vector>
 #include <math.h>
 #include <iomanip>
+#include <chrono>
+#include <ctime>
+
 
 /* Constantes predefinidas de la simulación */
 #define GRAVITY 6.674E-5
@@ -15,9 +18,9 @@
 #include "estructuras.h"
 
 using namespace std;
+using namespace std::chrono;
 
-
-/* Declaración de funciones */
+/* Predeclaración de funciones */
 vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem);
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
@@ -25,6 +28,8 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
 void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int iteration);
 void gen_out_file(string out_file_path, vector<Asteroide> asteroides);
+void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
+                   duration<double> duracion_ejecucion, duration<double> duracion_media_iteracion);
 void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_fuerzas_x(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
@@ -202,6 +207,21 @@ void gen_out_file(string out_file_path, vector<Asteroide> asteroides){
     }
 
     initconf.close();
+}
+
+/* Generación del archivo tests.csv con las posiciones finales de los asteroides, velocidades y masas.
+    Recibe el path para al archivo tests.txt y los vectores con la info de los ateroides.
+    No devuelve nada.
+*/
+void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
+                   duration<double> duracion_ejecucion, duration<double> duracion_media_iteracion){
+    /* Preparación para la escritura del archivo */
+    ofstream initconf;
+    initconf.open (out_file_path, ios::out | ios::app | ios::binary);
+    initconf << std::fixed;
+    initconf << std::setprecision(3);
+
+    initconf << num_iteraciones << ", " <<  num_asteroides << ", " << num_planetas << ", " << duracion_ejecucion.count() << ", " << duracion_media_iteracion.count() << "\n";
 }
 
 
@@ -382,7 +402,7 @@ void calc_fuerzas_y(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
         asteroide.add_fuerza_y(fuerza_y);
     }
 
-    /* Cálculo de de componentes Y de la fuerza de atracción sobre un asteroide ejercida por los planetas */
+    /* Cálculo de componentes Y de la fuerza de atracción sobre un asteroide ejercida por los planetas */
     for(size_t i = 0; i <= dists_planetas.size() - 1; ++i){
         double fuerza_y = ((GRAVITY * asteroide.get_masa() * planetas[i].get_masa()) /
         pow(asteroide.get_dist_planetas()[i], 2)) * sin(ang_influencia[i + asteroides.size()]);
@@ -412,7 +432,6 @@ void calc_mov_asteroide(Asteroide& asteroide){
     /* Sumatorio de las fuerzas totales X */
     for(size_t i = 0; i <= fuerzas_x.size() - 1; ++i){
         asteroide.set_fuerza_tot_x(asteroide.get_fuerza_tot_x() + fuerzas_x[i]);
-
     }
 
     /* Sumatorio de las fuerzas totales Y */
