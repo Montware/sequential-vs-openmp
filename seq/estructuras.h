@@ -2,149 +2,212 @@
 using namespace std;
 
 
+
+/* Clase para representar los objetos de tipo Planeta.
+    Son elementos estáticos con masa que no se ven sujetos a la interacción gravitatoria.
+*/ 
 class Planeta {
+    /* Variables */
     private:
-        double corx, cory, masa;
+        double pos_x, pos_y, masa;
 
     public:
-        Planeta(double corx1, double cory1, double masa1){
-            corx = corx1;
-            cory = cory1;
-            masa = masa1;
-        }//constructor por defecto
-        virtual ~Planeta(){}; //destructor
-        double getCorx(){
-            return corx;
+        /* Constructor por defecto */
+        Planeta(double pos_x, double pos_y, double masa){
+            this -> pos_x = pos_x;
+            this -> pos_y = pos_y;
+            this -> masa = masa;
         }
-        double getCory(){
-            return cory;
+        
+        /* Destructor */
+        virtual ~Planeta(){};
+
+        /* Getters y Setters */        
+        double get_pos_x(){
+            return pos_x;
         }
-        double getMasa(){
+        
+        double get_pos_y(){
+            return pos_y;
+        }
+        
+        double get_masa(){
             return masa;
         }
 };
 
-class Asteriode {
-    private:
-        double corx=0.0, cory=0.0, masa=0.0;
-        vector <double> dist_asteriodes;
-        vector <double> dist_planetas;
-        vector <double> angulo_influencia, pendiente; 
-        double angulo_movimiento=0.0; //angulo del moviento
-        vector<double> fuerzax, fuerzay;//fuerzas de atrancion
-        double fuerzax_tot=0.0, fuerzay_tot=0.0; //fuerza total
-        double aceleracionx=0.0, aceleraciony=0.0; //acelacion en el instante pedido
-        double velx=0.0, vely=0.0; //velocidad en el instante pedido
 
+/* Clase para representar los objetos de tipo Asteroide.
+    Son elementos dinámicos con masa que se ven sujetos a la interacción gravitatoria y los impactos.
+*/ 
+class Asteroide {
+    private:
+        double pos_x, pos_y, masa;
+        vector <double> dist_asteroides;
+        vector <double> dist_planetas;
+        vector <double> ang_influencia, pendiente;  // Ángulos del influencia y pendiente
+        double ang_movimiento;       // Ángulo del movimiento
+        vector<double> fuerzas_x, fuerzas_y;        // Fuerzas de atracción
+        double fuerza_x_tot, fuerza_y_tot;        // Fuerzas totales influyentes
+        double acel_x, acel_y;      // Aceleraciones
+        double vel_x, vel_y;      // Velocidades
+
+    /* Constructor por defecto */
     public:
-        Asteriode(){}
-        Asteriode(double corx1, double cory1, double masa1){
-            this->corx = corx1;
-            this->cory = cory1;
-            this->masa = masa1;
+        Asteroide(){}
+        Asteroide(double pos_x, double pos_y, double masa){
+            this -> pos_x = pos_x;
+            this -> pos_y = pos_y;
+            this -> masa = masa;
         };
-        virtual ~Asteriode(){};
-        double getCorx(){
-            return this->corx;
+                
+        /* Destructor */
+        virtual ~Asteroide(){};
+
+        /* Getters y Setters */        
+        double get_pos_x(){
+            return this -> pos_x;
         };
-        double getCory(){
-            return this->cory;
+
+        void set_pos_x(double pos_x){
+            this -> pos_x = pos_x;
         };
-        void setCorx(double corxq){
-            this->corx=corxq;
+
+        double get_pos_y(){
+            return this -> pos_y;
         };
-        void setCory(double coryq){
-            this->cory=coryq;
+
+        void set_pos_y(double pos_y){
+            this -> pos_y = pos_y;
         };
-        double getMasa(){
-            return this->masa;
+
+        double get_masa(){
+            return this -> masa;
         };
-        void addDistAsteroides(double astw){
-            this->dist_asteriodes.push_back(astw);
+
+        vector<double> get_dist_asteroides(){
+            return this -> dist_asteroides;
         };
-        void addDistPlanetas(double plnw){
-            this->dist_planetas.push_back(plnw);
+
+        vector<double> get_dist_planetas(){
+            return this -> dist_planetas;
         };
-        void removeDistAsteroides(){
-            this->dist_asteriodes.clear();
+
+        vector<double> get_fuerzas_x(){
+            return this -> fuerzas_x;
         };
-        void removeDistPlanetas(){
-            this->dist_planetas.clear();
+        
+        vector<double> get_fuerzas_y(){
+            return this -> fuerzas_y;
         };
-        void removeMovimientoNormal(){
-            this->pendiente.clear();
-            this->angulo_influencia.clear();
+   
+        vector<double> get_ang_influencia(){
+            return this -> ang_influencia;
         };
-        vector<double> getDistAsteroides(){
-            return this->dist_asteriodes;
-        };
-        vector<double> getDistPlanetas(){
-            return this->dist_planetas;
-        };
-        void addFuerzaX(double ast){
-            this->fuerzax.push_back(ast);
-        };
-        void addFuerzaY(double pln){
-            this->fuerzay.push_back(pln);
-        };
-        void removeFuerzasX(){
-            this->fuerzax.clear();
-        };
-        void removeFuerzasY(){
-            this->fuerzay.clear();
-        };
-        vector<double> getFuerzaX(){
-            return this->fuerzax;
-        };
-        vector<double> getFuerzaY(){
-            return this->fuerzay;
-        };
-        void addAnguloInfluencia(double asta){
-            this->angulo_influencia.push_back(asta);
-        };
-        void addPendiente(double plnq){
-            this->pendiente.push_back(plnq);
-        };
-        vector<double> getAnguloInfluencia(){
-            return this->angulo_influencia;
-        };
-        vector<double> getPendiente(){
-            return this->pendiente;
+
+        vector<double> get_pendiente(){
+            return this -> pendiente;
         }; 
-        double getAceleracionX(){
-            return this->aceleracionx;
+
+        double get_acel_x(){
+            return this -> acel_x;
         }; 
-        double getAceleracionY(){
-            return this->aceleraciony;
+
+        void set_acel_x(double acel_x){
+            this -> acel_x = acel_x;
         };
-        void setAceleracionX(double aclx){
-            this->aceleracionx=aclx;
+
+        double get_acel_y(){
+            return this -> acel_y;
         };
-        void setAceleracionY(double acly){
-            this->aceleraciony=acly;
-        }; 
-        double getVelx(){
-            return this->velx;
+
+        void set_acel_y(double acel_y){
+            this -> acel_y = acel_y;
         };
-        double getVely(){
-            return this->vely;
+
+        double get_vel_x(){
+            return this -> vel_x;
         };
-        void setVelx(double velx1){
-            this->velx = velx1;
+
+        void set_vel_x(double vel_x){
+            this -> vel_x = vel_x;
         };
-        void setVely(double vely1){
-            this->vely=vely1;
+
+        double get_vel_y(){
+            return this -> vel_y;
+        };
+
+        void set_vel_y(double vel_y){
+            this -> vel_y=vel_y;
         };  
-        double getFuerzaTotx(){
-            return this->fuerzax_tot;
+
+        double get_fuerza_tot_x(){
+            return this -> fuerza_x_tot;
         };
-        double getFuerzaToty(){
-            return this->fuerzay_tot;
+        double get_fuerza_tot_y(){
+            return this -> fuerza_y_tot;
         };
-        void setFuerzaTotx(double forx){
-            this->fuerzax_tot=forx;
+        void set_fuerza_tot_x(double fuerza_x_tot){
+            this -> fuerza_x_tot = fuerza_x_tot;
         };
-        void setFuerzaToty(double fory){
-            this->fuerzay_tot=fory;
+        void set_fuerza_tot_y(double fuerza_y_tot){
+            this -> fuerza_y_tot = fuerza_y_tot;
         }; 
+
+        /* Helpers */
+        /* Añade a un asteroide la distancia con otro asteroide */
+        void add_dist_asteroides(double dist_asteroide){
+            this -> dist_asteroides.push_back(dist_asteroide);
+        };
+
+        /* Vacía el vector de distancias de un asteroide con los demás */
+        void clear_dists_asteroides(){
+            this -> dist_asteroides.clear();
+        };
+
+        /* Añade a un asteroide la distancia con planeta */
+        void add_dist_planetas(double dist_planeta){
+            this -> dist_planetas.push_back(dist_planeta);
+        };
+
+        /* Vacía el vector de distancias de un asteroide con los planetas */
+        void clear_dists_planetas(){
+            this -> dist_planetas.clear();
+        };
+     
+        /* Vacía el vector de movimientos normales incluyendo el ángulo de influencia */
+        void clear_movs_normales(){
+            this -> pendiente.clear();
+            this -> ang_influencia.clear();
+        };
+
+        /* Añade la componente X de una fuerza influyente sobre un asteroide */
+        void add_fuerza_x(double fuerzas_x){
+            this -> fuerzas_x.push_back(fuerzas_x);
+        };
+
+        /* Vacía el vector de componentes X de fuerzas influyentes en el asteroide */
+        void clear_fuerzas_x(){
+            this -> fuerzas_x.clear();
+        };
+
+        /* Añade la componente Y de una fuerza influyente sobre un asteroide */
+        void add_fuerza_y(double fuerzas_y){
+            this -> fuerzas_y.push_back(fuerzas_y);
+        };
+
+        /* Vacía el vector de componentes Y de fuerzas influyentes en el asteroide */
+        void clear_fuerzas_y(){
+            this -> fuerzas_y.clear();
+        };
+
+        /* Añade un ángulo de influencia sobre un asteroide */
+        void add_ang_influencia(double ang_ingluencia){
+            this -> ang_influencia.push_back(ang_ingluencia);
+        };
+
+        /* Añade una pendiente del ángulo de influencia sobre un asteroide */
+        void add_pendiente(double pendiente){
+            this -> pendiente.push_back(pendiente);
+        };
 };

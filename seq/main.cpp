@@ -12,28 +12,36 @@
 #endif
 
 #include "metodos.h"
-//#include "estructuras.h"
+
 using namespace std;
 using namespace std::chrono;
-// Definicion de constantes del proyecto
+
+/* Definicion de constantes del proyecto */
 #define GRAVITY 6.674E-5
 #define PERIODO 0.1
-#define DISTMIN 2.0
+// #define DISTMIN 5.0      // TODO: Borrar
 #define ANCHURA 200
 #define ALTURA 200
 #define MEDIADISTRIBUCIONMASAS 1000
 #define DESVIACIONSDM 50
-#define SPACE " "
 
+/* Definicion de constantes con los nombres de los archivos de entrada y salida */
 #define INITFILE "init_conf.txt"
 #define STEPSFILE "stepbystep.txt"
 #define OUTFILE "out.txt"
 
+/* Ejecución principal */
 int main(int argc, char const *argv[])
 {
-    cout << "Ejecutando archivo" << endl;
-    high_resolution_clock::time_point t1 = high_resolution_clock::now();
-    //checkeo de los datos introducidos como parametros
+    cout << "Ejecutando archivo" << endl;       // TODO: Ver si borrar
+    int num_iteraciones;
+
+    /* Inicio del temportizador para métrica de tiempo del programa*/
+    high_resolution_clock::time_point program_start_time = high_resolution_clock::now();
+    high_resolution_clock::time_point loops_start_time;
+
+    /* Comprobación de los parámetros de entrada para la ejecución del programa*/
+    /* Comprobamos que no hay menos de 4 */     // TODO: Ver si quitar este if ya que se comprueba si son distintos de 5
     if (argc <= 4)
     {
         printf("nasteroids-seq: Wrong arguments.\n");
@@ -43,65 +51,81 @@ int main(int argc, char const *argv[])
     }
     else
     {
+        /* Comprobamos que hay 5 parámetros */
         if (argc != 5)
         {
             printf("nasteroids-seq: Wrong arguments.\n");
             printf("Correct use:\n");
             printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
             exit(EXIT_FAILURE);
-        }
-        else
-        {
+        } else {
+            /* Obtenemos los parámetros introducidos */
             int num_asteroides = stoi(argv[1]);
-            int num_iteraciones = stoi(argv[2]);
+            num_iteraciones = stoi(argv[2]);
             int num_planetas = stoi(argv[3]);
             int semilla = stoi(argv[4]);
+
+            /* Comprobamos ningún parámetro es negativo */
             if (num_asteroides < 0 || num_iteraciones < 0 || num_planetas < 0 || semilla < 0)
             {
+                // TODO: Comprobar que son un numero con isnan y ver si fuera posible poner las variables d elos parametros de entrada como unsigned int
                 printf("nasteroids-seq: Wrong arguments.\n");
                 printf("Correct use:\n");
                 printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
                 exit(EXIT_FAILURE);
-            }
-            else
-            {
-                //precarga el programa y genera datos -- paso 1
-                vector<Asteriode> gast = initAsteriodes(num_asteroides, semilla);
-                vector<Planeta> planetas = initPlanetas(num_planetas, semilla);
-                generateFile(INITFILE, gast, planetas, num_asteroides, num_iteraciones, num_planetas, semilla);
+            } else {
+                /* Paso 1 (inicial) */
+                /* Preparación de los vectores de objetos para el programa y generaciónd e datos y archivo init_config.txt */
+                vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla);
+                vector<Planeta> planetas = init_planetas(num_planetas, semilla);
+                gen_init_file(INITFILE, asteroides, planetas, num_asteroides, num_iteraciones, num_planetas, semilla);
                 vector<double> velocidades_finales_x;
                 vector<double> velocidades_finales_y;
-                //calcula fuerzas y genera datos -- paso 2
-                
-                
-                for (int ia = 0; ia <= num_iteraciones - 1; ia++)
-                {
-                    
-                    for (size_t i = 0; i <= gast.size() - 1; i++)
-                    {
-                        //printf("%f %f\n", gast.at(i).getCorx(), gast.at(i).getCory());
-                        //Asteriode selast = gast[i];
-                        calcularDistancia(gast[i], gast, planetas);
-                        //cout << "distancia asteroide introducida de asteroide " << i << " con asteroide 4 = " << gast[i].getDistAsteroides()[4] << endl;
 
-                        calcularMovimientoNormal(gast[i], gast, planetas);
-                        calcularFuerzaX(gast[i], gast, planetas);
-                        calcularFuerzaY(gast[i], gast, planetas);
-                        calcularMovimientoAsteriode(gast[i]);
-                        calcularRebotePared(gast[i]);
+                /* Inicio del temportizador para métrica de tiempo de los bucles */
+                loops_start_time = high_resolution_clock::now();
+
+                /* Paso 2 (cálculo del movimiento de asteroides) */
+                /* Cálculo de fuerzas y movimientos y actualización de la info de asteroides en cada iteración */
+                for (int i = 0; i <= num_iteraciones - 1; ++i)
+                {   
+                    /* Cálculos de cada asteroide */
+                    for (size_t j = 0; j <= asteroides.size() - 1; ++j)
+                    {
+                        //printf("%f %f\n", gast.at(i).getCorx(), gast.at(i).getCory());        // TODO: BORRAR
+                        //Asteriode selast = gast[i];       // TODO: BORRAR
+                        calc_distancias(asteroides[j], asteroides, planetas);
+                        //cout << "distancia asteroide introducida de asteroide " << i << " con asteroide 4 = " << gast[i].getDistAsteroides()[4] << endl;      // TODO: BORRAR
+                        calc_movs_normales(asteroides[j], asteroides, planetas);
+                        calc_fuerzas_x(asteroides[j], asteroides, planetas);
+                        calc_fuerzas_y(asteroides[j], asteroides, planetas);
+                        calc_mov_asteroide(asteroides[j]);
+                        calc_rebote_pared(asteroides[j]);
+
+                        // TODO: Revisar donde se esta llamando el calculo de fuerzas totales (sumatorio)
                     }
-                    calcularReboteAsteroides(gast);
-                    generateStepFile(STEPSFILE, gast, planetas, ia);
+
+                    calc_rebote_asteroides(asteroides);
+                    gen_step_file(STEPSFILE, asteroides, planetas, i);
                 }
+
                 //acaba el prorama imprimiendo el archivo de salida -- paso 3
-                generateOutFile(OUTFILE, gast);
+                gen_out_file(OUTFILE, asteroides);
             }
         }
     }
 
-    high_resolution_clock::time_point t2 = high_resolution_clock::now();
-    duration<double> time_span = duration_cast<duration<double>>(t2 - t1);
-    cout << "Tiempo total de ejecucion = " << time_span.count() << " segundos" << endl;
+    /* Fin del temportizador para métrica de tiempo */
+    high_resolution_clock::time_point program_end_time = high_resolution_clock::now();
+
+    /* Cálculo de tiempo medio de cada iteración */
+    duration<double> duracion_ejecucion_loops = duration_cast<duration<double>>(program_end_time - loops_start_time);
+    duration<double> duracion_media_iteracion = duracion_ejecucion_loops / num_iteraciones;
+    cout << "Tiempo medio de cada iteración = " << duracion_media_iteracion.count() << " segundos" << endl;
+
+    /* Cálculo de tiempo total del programa */
+    duration<double> duracion_ejecucion = duration_cast<duration<double>>(program_end_time - program_start_time);
+    cout << "Tiempo total de ejecucion = " << duracion_ejecucion.count() << " segundos" << endl;
 
     return 0;
 }
