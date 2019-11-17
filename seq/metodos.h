@@ -238,8 +238,6 @@ void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<
 }
 
 
-
-
 /* Cálculo del movimiento normal provocado por las por los demás asteroides y planetas y actualización de su info.
     Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
     No devuelve nada.
@@ -255,41 +253,59 @@ void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vect
 
     /* Cálculo del movimiento normal provocado en un asteroide por los demás */
     for(size_t i = 0; i <= asteroides.size() - 1; ++i){
-        /* Cálculo de pendiente */
-        double pendiente_gen = (asteroide.get_pos_y() - asteroides[i].get_pos_y()) /
-        (asteroide.get_pos_x() - asteroides[i].get_pos_x());
-        
-        /* Correción antes de almacenar */
-        if (pendiente_gen > 1 || pendiente_gen < -1){
-            pendiente_gen = pendiente_gen - ((int) pendiente_gen / 1);
-        }
 
-        /* Comprobamos que es un número */
-        if(isnan(pendiente_gen) > 0){         // TODO: Revisar qué es "isnan". Ver si es necesario este if
-            pendiente_gen = 0.0;
+        /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la pendiente es ignorada */
+        if(asteroide.get_dist_asteroides()[i] >= DISTMIN){
+            /* Cálculo de pendiente */
+            double pendiente_gen = (asteroide.get_pos_y() - asteroides[i].get_pos_y()) /
+            (asteroide.get_pos_x() - asteroides[i].get_pos_x());
+            
+            /* Correción antes de almacenar */
+            //if (pendiente_gen > 1 || pendiente_gen < -1){     TODO: Borrar
+            if (pendiente_gen > 1){
+                //pendiente_gen = pendiente_gen - ((int) pendiente_gen / 1);    TODO: Borrar
+                pendiente_gen = 1;
+            } else if (pendiente_gen < -1){
+                pendiente_gen = -1;
+            }
+
+            /* Comprobamos que es un número correcto */
+            if(isnan(pendiente_gen) > 0){         // TODO: Revisar qué es "isnan". Ver si es necesario este if
+                pendiente_gen = 0.0;
+            }
+            asteroide.add_pendiente(pendiente_gen);
+            /* Cálculo del ángulo con la arcotangente */
+            asteroide.add_ang_influencia(atan(pendiente_gen));
         }
-        asteroide.add_pendiente(pendiente_gen);
-        asteroide.add_ang_influencia(atan(pendiente_gen));
     }
 
     /* Cálculo del movimiento normal provocado en un asteroide por los planetas */
     for(size_t i = 0; i <= planetas.size() - 1; ++i){
-        /* Cálculo de pendiente */
-        double pendiente_gen2 = (asteroide.get_pos_y() - planetas[i].get_pos_y()) /
-        (asteroide.get_pos_x() - planetas[i].get_pos_x());
         
-        /* Correción antes de almacenar */
-        if (pendiente_gen2 > 1 || pendiente_gen2 < -1){
-            pendiente_gen2 = pendiente_gen2 - ((int) pendiente_gen2 / 1);
-        }
+        /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la pendiente es ignorada */  
+        if(asteroide.get_dist_planetas()[i] >= DISTMIN){
+            /* Cálculo de pendiente */
+            double pendiente_gen2 = (asteroide.get_pos_y() - planetas[i].get_pos_y()) /
+            (asteroide.get_pos_x() - planetas[i].get_pos_x());
+            
+            /* Correción antes de almacenar */
+            //if (pendiente_gen2 > 1 || pendiente_gen2 < -1){       TODO: Borrar
+            if (pendiente_gen2 > 1){
+                //pendiente_gen2 = pendiente_gen2 - ((int) pendiente_gen2 / 1);     TODO: Borrar
+                pendiente_gen2 = 1;
+            } else if (pendiente_gen2 < -1){
+                pendiente_gen2 = -1;
+            }
 
-        /* Comprobamos que es un número */
-        if(isnan(pendiente_gen2) > 0){         // TODO: Revisar qué es "isnan". Ver si es necesario este if
-            pendiente_gen2 = 0.0;
-        }
+            /* Comprobamos que es un número */
+            if(isnan(pendiente_gen2) > 0){         // TODO: Revisar qué es "isnan". Ver si es necesario este if
+                pendiente_gen2 = 0.0;
+            }
 
-        asteroide.add_pendiente(pendiente_gen2);
-        asteroide.add_ang_influencia(atan(pendiente_gen2));
+            asteroide.add_pendiente(pendiente_gen2);
+            /* Cálculo del ángulo con la arcotangente */
+            asteroide.add_ang_influencia(atan(pendiente_gen2));
+        }
     }
 }
 
@@ -313,21 +329,35 @@ void calc_fuerzas_x(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
     /* Cálculo de componentes X de la fuerza de atracción sobre un asteroide ejercida por los demás */
     //for(size_t i = 0; i <= dist_asteroide.size() - 1; ++i){       // TODO: Borrar
     for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i){
+        double fuerza_x;
 
         /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la fuerza es ignorada (nula) */
         if(asteroide.get_dist_asteroides()[i] < DISTMIN){
-            asteroide.add_fuerza_x(0);
+            fuerza_x = 0.0;
         } else {
-            double fuerza_x = ((GRAVITY * asteroide.get_masa() * asteroides[i].get_masa()) /
-            pow(asteroide.get_dist_asteroides()[i], 2)) * cos(angs_influencia[i]);
+            fuerza_x = ((GRAVITY * asteroide.get_masa() * asteroides[i].get_masa()) /
+                         pow(asteroide.get_dist_asteroides()[i], 2)) * cos(angs_influencia[i]);
             asteroide.add_fuerza_x(fuerza_x);
         }
+
+        /* Comprobación de fuerzas superiors a 100 */
+        if (fuerza_x > 100.0){
+            fuerza_x = 100.0;
+        }
+
+        asteroide.add_fuerza_x(fuerza_x);
     }
 
     /* Cálculo de de componentes X de la fuerza de atracción sobre un asteroide ejercida por los planetas */
     for(size_t i = 0; i <= dists_planetas.size() - 1; ++i){
         double fuerza_x = ((GRAVITY * asteroide.get_masa() * planetas[i].get_masa()) /
         pow(asteroide.get_dist_planetas()[i], 2)) * cos(angs_influencia[i + asteroides.size()]);
+        
+        /* Comprobación de fuerzas superiors a 100 */        
+        if (fuerza_x > 100.0){
+            fuerza_x = 100.0;
+        }
+
         asteroide.add_fuerza_x(fuerza_x);
     }
 }
@@ -348,22 +378,35 @@ void calc_fuerzas_y(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
 
     /* Cálculo de componentes Y de la fuerza de atracción sobre un asteroide ejercida por los demás */
     //for(size_t i = 0; i <= dist_asteroide.size() - 1; ++i){       // TODO: Borrar
-    for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i){
-        
+    for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i){       
+        double fuerza_y;
+
         /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la fuerza es ignorada (nula) */
         if(asteroide.get_dist_asteroides()[i] < DISTMIN){
-            asteroide.add_fuerza_y(0);
+            fuerza_y = 0.0;
         } else {
-            double fuerza_y = ((GRAVITY * asteroide.get_masa() * asteroides[i].get_masa()) /
+            fuerza_y = ((GRAVITY * asteroide.get_masa() * asteroides[i].get_masa()) /
             pow(asteroide.get_dist_asteroides()[i], 2)) * sin(ang_influencia[i]);
-            asteroide.add_fuerza_y(fuerza_y);
         }
+
+        /* Comprobación de fuerzas superiors a 100 */
+        if (fuerza_y > 100.0){
+            fuerza_y = 100.0;
+        }
+
+        asteroide.add_fuerza_y(fuerza_y);
     }
 
     /* Cálculo de de componentes Y de la fuerza de atracción sobre un asteroide ejercida por los planetas */
     for(size_t i = 0; i <= dists_planetas.size() - 1; ++i){
         double fuerza_y = ((GRAVITY * asteroide.get_masa() * planetas[i].get_masa()) /
         pow(asteroide.get_dist_planetas()[i], 2)) * sin(ang_influencia[i + asteroides.size()]);
+
+        /* Comprobación de fuerzas superiors a 100 */
+        if (fuerza_y > 100.0){
+            fuerza_y = 100.0;
+        }
+        
         asteroide.add_fuerza_y(fuerza_y);
     }
 }
@@ -419,7 +462,7 @@ void calc_mov_asteroide(Asteroide& asteroide){
     double pos_x = asteroide.get_pos_x();
     pos_x = pos_x + velx * PERIODO;
 
-    /* Cálculo de la posición X*/
+    /* Cálculo de la posición Y*/
     double pos_y = asteroide.get_pos_y();
     pos_y = pos_y + vely * PERIODO;
 
@@ -447,28 +490,26 @@ void calc_rebote_pared(Asteroide& asteroide){
         cambiando el signo de su velocidad */
     // TODO: Revisar si cuando posx <= 0 o posx <= DISTMIN o posx <= 2 y lo mismo en los demas laterales
     // TODO: En caso de ser <= DISTMIN, borrar sentencias asteroide.set_pos_x(DISTMIN);
-    if(pos_x <= DISTMIN)
+    if(pos_x <= 0)
     {
         asteroide.set_pos_x(DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
-    } else if (pos_y <= DISTMIN)
+    } else if (pos_y <= 0)
     {
         asteroide.set_pos_y(DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
 
-    } else if (pos_x >= ANCHURA - DISTMIN)
+    } else if (pos_x >= ANCHURA)
     {
         asteroide.set_pos_x(ANCHURA - DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
 
-    } else if (pos_y >= ALTURA - DISTMIN)
+    } else if (pos_y >= ALTURA)
     {
         asteroide.set_pos_y(ALTURA - DISTMIN);       // TODO: Revisar si es DISTMIN (=5) o 2
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
     }
 }
-
-
 
 
 /* Cálculo de rebote entre asteroides.
@@ -497,7 +538,7 @@ void calc_rebote_asteroides(vector<Asteroide> asteroides){
                 cout << "REBOTE ENTRE ASTEROIDES " << i << " con pos " << asteroides[i].get_pos_x() <<
                 ", " << asteroides[i].get_pos_y() << " y " << j << " con pos " <<
                 asteroides_temp_copy[j].get_pos_x() << ", " << asteroides_temp_copy[j].get_pos_y() << endl;
-                /* Intercambias las velocidades*/
+                /* Intercambio de velocidades*/
                 // TODO: Revisar con la especificacion/enunciado que el cambio de velocidades está bien hecho (si es cruzado o no)
                 asteroides[i].set_vel_x(-1 * asteroides_temp_copy[j].get_vel_x());
                 asteroides[i].set_vel_y(-1 * asteroides_temp_copy[j].get_vel_y());
