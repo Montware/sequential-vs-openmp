@@ -65,8 +65,8 @@ int main(int argc, char const *argv[])
             int num_planetas = stoi(argv[3]);
             int semilla = stoi(argv[4]);
 
-            /* Comprobamos ningún parámetro es negativo */
-            if (num_asteroides < 0 || num_iteraciones < 0 || num_planetas < 0 || semilla < 0)
+            /* Comprobamos ningún parámetro es negativo o semilla no positiva */
+            if (num_asteroides < 0 || num_iteraciones < 0 || num_planetas < 0 || semilla <= 0)
             {
                 // TODO: Comprobar que son un numero con isnan y ver si fuera posible poner las variables d elos parametros de entrada como unsigned int
                 printf("nasteroids-seq: Wrong arguments.\n");
