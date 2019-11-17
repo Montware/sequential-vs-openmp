@@ -1,0 +1,33 @@
+{
+    // Custom Run configuration settings to debug C++ program
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "C++ Custom Launcher",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/seq/nasteroids-seq",
+            "args": ["10",
+                     "250",
+                     "5",
+                     "2000"],
+            "preLaunchTask": "g++ custom build active file",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558 
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "g++ custom build active file",
+            "command": "/usr/bin/g++",
+            "args": [
+                "/media/dev/DATA/CLOUD/0_MEGA_UC3M/WS/'VISUAL STUDIO'/UNI/ARCOS/sequential-vs-openmp/seq/main.cpp",
+                "-o",
+                "/media/dev/DATA/CLOUD/0_MEGA_UC3M/WS/'VISUAL STUDIO'/UNI/ARCOS/sequential-vs-openmp/seq/nasteroids-seq",
+                "-std=c++14",
+                "-Wall",
+                "-Wextra",
+                "-Wno-deprecated",
+                "-Werror",
+                "-pedantic",
+                "-pedantic-errors",
+                "-g"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

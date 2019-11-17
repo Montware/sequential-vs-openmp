@@ -17,8 +17,8 @@ clear
 
 printf "\nCompilando programa:\n"  
 # TODO: Ver como incluir -03 -DNDEBUG sin que de error
+# To debug: g++ main.cpp -o nasteroids-seq -std=c++14 -Wall -Wextra -Wno-deprecated -Werror -pedantic -pedantic-errors -g
 g++ main.cpp -o nasteroids-seq -std=c++14 -Wall -Wextra -Wno-deprecated -Werror -pedantic -pedantic-errors
-
 #./nasteroids2018-base_v20 5 2 8 100
 
 #valgrind --tool=cachegrind --cachegrind-out-file=vgrind_seq_out --I1=16384,8,32 --LL=131072,8,64 --branch-sim=yes ./nasteroids-seq 5 2 8 100

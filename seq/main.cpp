@@ -99,6 +99,7 @@ int main(int argc, char const *argv[])
                         calc_movs_normales(asteroides[j], asteroides, planetas);
                         calc_fuerzas_x(asteroides[j], asteroides, planetas);
                         calc_fuerzas_y(asteroides[j], asteroides, planetas);
+                        // TODO: Calc mov asteroide bugged, fix
                         calc_mov_asteroide(asteroides[j]);
                         calc_rebote_pared(asteroides[j]);
 

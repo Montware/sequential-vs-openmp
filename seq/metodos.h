@@ -215,6 +215,11 @@ void calc_fuerzas_x(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
         double fuerza_x = ((GRAVITY * asteroide.get_masa() * planetas[i].get_masa()) / pow(asteroide.get_dist_planetas()[i], 2)) * cos(angs_influencia[i + asteroides.size()]);
         asteroide.add_fuerza_x(fuerza_x);
     }
+
+    // TODO: Borrar impresión de prueba
+    vector<double> fuerza_x_0 = asteroide.get_fuerzas_x();
+    cout << fuerza_x_0[0] << "\n" << endl;
+    cout << fuerza_x_0[1] << "\n" << endl;
 }
 
 
@@ -343,7 +348,15 @@ void calc_mov_asteroide(Asteroide& asteroide){
 
     /* Sumatorio de las fuerzas totales X */
     for(size_t i = 0; i <= fuerzas_x.size() - 1; ++i){
+                            // TODO: borrar prints
+                                                                                    printf("ESTOY AQUI\n");
+                                                                                    cout << "Obeteniendo fuerza_x i=" << i << " del asteroide\n" << endl;
+                                                                                    cout << fuerzas_x[i] << endl;
+                                                                                 printf("ESTOY AQUI\n");
+
+
         asteroide.set_fuerza_tot_x(asteroide.get_fuerza_tot_x() + fuerzas_x[i]);
+
     }
 
     /* Sumatorio de las fuerzas totales Y */
