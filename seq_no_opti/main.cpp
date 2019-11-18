@@ -116,7 +116,8 @@ int main(int argc, char const *argv[])
     cout << "Tiempo total de ejecucion = " << duracion_ejecucion.count() << " segundos" << endl;
 
     /* Almacenamiento de tiempos para los tests de evaluación con métrica */
-    gen_test_file(TESTFILE, num_iteraciones, num_asteroides, num_planetas, duracion_ejecucion, duracion_media_iteracion);
+    gen_test_file(TESTFILE, num_iteraciones, num_asteroides, num_planetas,
+                  duracion_ejecucion.count(), duracion_media_iteracion.count());
 
     return 0;
 }

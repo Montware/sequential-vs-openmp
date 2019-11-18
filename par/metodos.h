@@ -29,7 +29,7 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
                    unsigned int iteration);
 void gen_out_file(string out_file_path, vector<Asteroide> asteroides);
 void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
-                   duration<double> duracion_ejecucion, duration<double> duracion_media_iteracion);
+                   double duracion_ejecucion, double duracion_media_iteracion);
 void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_fuerzas(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
@@ -231,7 +231,7 @@ void gen_out_file(string out_file_path, vector<Asteroide> asteroides)
     No devuelve nada.
 */
 void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
-                   duration<double> duracion_ejecucion, duration<double> duracion_media_iteracion)
+                   double duracion_ejecucion, double duracion_media_iteracion)
 {
     /* Preparación para la escritura del archivo */
     ofstream initconf;
@@ -239,7 +239,8 @@ void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides
     initconf << std::fixed;
     initconf << std::setprecision(3);
 
-    initconf << num_iteraciones << ", " <<  num_asteroides << ", " << num_planetas << ", " << duracion_ejecucion.count() << ", " << duracion_media_iteracion.count() << "\n";
+    initconf << num_iteraciones << ", " <<  num_asteroides << ", " << num_planetas << ", " <<
+        duracion_ejecucion << ", " << duracion_media_iteracion << "\n";
 }
 
 
