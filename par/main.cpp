@@ -46,6 +46,7 @@ int main(int argc, char const *argv[])
 
 
     cout << "Ejecutando nasteroides-par optimizado" << endl;
+    //double t1 = omp_get_wtime();      // TODO: Sustituir chronos por omp_get_wtime
 
     /* Inicio del temportizador para métrica de tiempo del programa*/
     high_resolution_clock::time_point program_start_time = high_resolution_clock::now();
@@ -90,7 +91,8 @@ int main(int argc, char const *argv[])
             /* Cálculo de fuerzas y movimientos y actualización de la info de asteroides en cada iteración */
             for (int i = 0; i <= num_iteraciones - 1; ++i)
             {   
-                /* Cálculos de cada asteroide */
+                /* Cálculos de cada asteroide en paralelo */
+                //#pragma omp parallel for ordered num_threads(n_threads) firstprivate(planetas)    // TODO: REVISAR Y SEGUIR POR AQUI                  
                 for (size_t j = 0; j <= asteroides.size() - 1; ++j)
                 {
                     calc_distancias(asteroides[j], asteroides, planetas);
