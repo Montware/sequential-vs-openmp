@@ -365,7 +365,8 @@ void calc_fuerzas(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Pla
     asteroide.clear_fuerzas_x();
     asteroide.clear_fuerzas_y();
 
-    /* Cálculo de componentes X de la fuerza de atracción sobre un asteroide ejercida por los demás */
+    /* Optimización A1: Fusión de bucles*/
+    /* Cálculo de componentes X e Y de la fuerza de atracción sobre un asteroide ejercida por los demás */
     for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i)
     {
         double fuerza_x;
@@ -400,7 +401,8 @@ void calc_fuerzas(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Pla
 
     }
 
-    /* Cálculo de de componentes X de la fuerza de atracción sobre un asteroide ejercida por los planetas */
+    /* Optimización A2: Fusión de bucles*/
+    /* Cálculo de de componentes X e Y de la fuerza de atracción sobre un asteroide ejercida por los planetas */
     for(size_t j = 0; j <= dists_planetas.size() - 1; ++j)
     {
         double fuerza_x = ((GRAVITY * asteroide.get_masa() * planetas[j].get_masa()) /
@@ -440,7 +442,7 @@ void calc_mov_asteroide(Asteroide& asteroide)
     asteroide.set_fuerza_tot_x(0.0);
     asteroide.set_fuerza_tot_y(0.0);
 
-    /* Optimización B1: Fusión de bucles*/
+    /* Optimización A3: Fusión de bucles*/
     /* Sumatorio de las fuerzas totales X e Y optimizado */
     for(size_t i = 0; i <= fuerzas_x.size() - 1 && i <= fuerzas_y.size() - 1; ++i)
     {

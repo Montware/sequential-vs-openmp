@@ -7,6 +7,9 @@
 # numPlanetas = 8;
 # semilla = 100;
 
+ulimit -s unlimited
+#KMP_STACKSIZE = 1m ./nasteroids-par
+
 if [ -f "stepbystep" ]; then
     rm -f stepbystep
 fi  
