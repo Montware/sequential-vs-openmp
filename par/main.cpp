@@ -36,11 +36,16 @@ using namespace std::chrono;
 /* Ejecución principal */
 int main(int argc, char const *argv[])
 {
-    cout << "Ejecutando nasteroides-par optimizado" << endl;
     int num_iteraciones;
     int num_asteroides;
     int num_planetas;
 
+    /* Configuración para procesamientos en paralelo */
+    int n_threads = omp_get_max_threads();
+    cout << "Numero maximo de nucleos = " << n_threads << endl;
+
+
+    cout << "Ejecutando nasteroides-par optimizado" << endl;
 
     /* Inicio del temportizador para métrica de tiempo del programa*/
     high_resolution_clock::time_point program_start_time = high_resolution_clock::now();
