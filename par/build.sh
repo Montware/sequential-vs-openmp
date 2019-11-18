@@ -10,8 +10,8 @@
 ulimit -s unlimited
 #KMP_STACKSIZE = 1m ./nasteroids-par        // TODO: Ver si necesario
 
-if [ -f "stepbystep" ]; then
-    rm -f stepbystep
+if [ -f "stepbystep.txt" ]; then
+    rm -f stepbystep.txt
 fi  
 
 clear
@@ -23,4 +23,4 @@ g++ main.cpp -o nasteroids-par -std=c++14 -O3 -DNDEBUG -Wall -fopenmp -Wextra -W
 #cg_annotate vgrind_seq_out --auto=yes
 
 # Ejecutando programa
-./nasteroids-par 10 250 5 2000
+./nasteroids-par 5 2 1 2000

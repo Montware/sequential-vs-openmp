@@ -50,7 +50,7 @@ int main(int argc, char const *argv[])
     /* Comprobamos que hay 5 parámetros */
     if (argc != 5)
     {
-        printf("nasteroids-seq: Wrong arguments.\n");
+        printf("nasteroids-seq-no-opti: Wrong arguments.\n");
         printf("Correct use:\n");
         printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
         exit(EXIT_FAILURE);
@@ -95,7 +95,7 @@ int main(int argc, char const *argv[])
                 }
 
                 calc_rebote_asteroides(asteroides);
-                gen_step_file(STEPSFILE, asteroides, planetas, i);
+                gen_step_file(STEPSFILE, asteroides, planetas);
             }
 
             // Acaba el programa imprimiendo el archivo de salida -- paso 3

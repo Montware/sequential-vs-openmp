@@ -7,8 +7,8 @@
 # numPlanetas = 8;
 # semilla = 100;
 
-if [ -f "stepbystep" ]; then
-    rm -f stepbystep
+if [ -f "stepbystep.txt" ]; then
+    rm -f stepbystep.txt
 fi  
 
 clear
@@ -20,4 +20,4 @@ g++ main.cpp -o nasteroids-seq -std=c++14 -O3 -DNDEBUG -Wall -Wextra -Wno-deprec
 #cg_annotate vgrind_seq_out --auto=yes
 
 # Ejecutando programa
-./nasteroids-seq 10 250 5 2000
+./nasteroids-seq 5 2 1 2000

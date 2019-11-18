@@ -95,7 +95,7 @@ int main(int argc, char const *argv[])
                 }
 
                 calc_rebote_asteroides(asteroides);
-                gen_step_file(STEPSFILE, asteroides, planetas, i);
+                gen_step_file(STEPSFILE, asteroides, planetas);
             }
 
             // Acaba el programa imprimiendo el archivo de salida -- paso 3

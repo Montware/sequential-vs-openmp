@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <chrono>
 #include <ctime>
+#include <iomanip>
 
 
 /* Constantes predefinidas de la simulación */
@@ -86,25 +87,25 @@ vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
     for(unsigned int i = 0;i <= num_planetas - 1; ++i)
     {
         /* Colocación de los planetas en los laterales del marco de forma uniformemente distribuida */
-        if(i % 1 == 0)
+        if(((i + 1) % 1) == 0)
         {
             pos_x = 0.0;
             pos_y = ydist(semilla);
         }
 
-        if(i % 2 == 0)
+        if(((i + 1) % 2) == 0)
         {
             pos_x = xdist(semilla);
             pos_y = 0.0;
         }
 
-        if(i % 3 == 0)
+        if(((i + 1) % 3) == 0)
         {
             pos_x = ANCHURA;
             pos_y = ydist(semilla);
         }
 
-        if(i % 4 == 0)
+        if(((i + 1) % 4) == 0)
         {
             pos_x = xdist(semilla);
             pos_y = ALTURA;
@@ -166,8 +167,7 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
     planetas, y los parámetros de ejecución del programa.
     No devuelve nada.
 */
-void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
-                   unsigned int iteration)
+void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas)
 {
     /* Preparación para la escritura del archivo */
     ofstream initconf;
@@ -175,29 +175,37 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
     initconf << std::fixed;
     initconf << std::setprecision(3);
 
-    initconf << "*******ITERATION " << (iteration + 1) << "*******\n";
-
     /* Escritura de las fuerzas de cada asteroide en cada iteración */
+    /* Escritura de asteroide vs asteroides */
+    initconf << "--- asteroids vs asteroids ---\n";
     for(size_t i = 0; i <= asteroides.size() - 1; ++i)
     {
         Asteroide asteroide = asteroides.at(i);
-        initconf << "--- asteroid " << i << " vs asteroids ---\n";
         
-        /* Escritura de asteroide vs asteroides */
         for(size_t j = 0; j <= asteroides.size() - 1; ++j)
         {
-            initconf << i << " " << j << " " << asteroide.get_fuerzas_x()[j] << 
-            " " << asteroide.get_ang_influencia()[j] << "\n";
-        }
-        
-        /* Escritura de asteroide vs planetas */
-        initconf << "--- asteroid " << i << " vs planets ---\n";
-        for(size_t k = 0; k <= planetas.size() - 1; ++k)
-        {
-           initconf << i << " " << k << " " << asteroide.get_fuerzas_x()[k + asteroides.size()] <<
-           " " << asteroide.get_ang_influencia()[k + asteroides.size()] << "\n";
+            if (j > i)
+            {
+                initconf << i << " " << j << " " << std::fixed << std::setprecision(6) << asteroide.get_fuerzas_x()[j] << 
+                " " << std::fixed << std::setprecision(6) << asteroide.get_ang_influencia()[j] << "\n";
+            }
         }
     }
+    
+    /* Escritura de asteroide vs planetas */
+    initconf << "--- asteroids vs planets ---\n";
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
+        Asteroide asteroide = asteroides.at(i);
+
+        for(size_t k = 0; k <= planetas.size() - 1; ++k)
+        {
+           initconf << i << " " << k << " " << std::fixed << std::setprecision(6) << asteroide.get_fuerzas_x()[k + asteroides.size()] <<
+           " " << std::fixed << std::setprecision(6) << asteroide.get_ang_influencia()[k + asteroides.size()] << "\n";
+        }
+    }
+
+    initconf << "\n******************** ITERATION ********************\n";
 
     initconf.close();
 }
