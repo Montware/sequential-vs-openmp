@@ -32,8 +32,7 @@ void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides
                    duration<double> duracion_ejecucion, duration<double> duracion_media_iteracion);
 void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
-void calc_fuerzas_x(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
-void calc_fuerzas_y(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
+void calc_fuerzas(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_mov_asteroide(Asteroide& asteroide);
 void calc_rebote_pared(Asteroide& asteroide);
 void calc_rebote_asteroides(vector<Asteroide> asteroides);
@@ -56,11 +55,13 @@ normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
     Recibe el número de asteroides introducidos y el valor de la semilla para la inicialización aleatoria.
     Devuelve un vector de asteroides con las posiciones X e Y y las masas ya definidas.
  */
-vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem){
+vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem)
+{
     vector<Asteroide> asteroides_vect;
     default_random_engine semilla{val_sem};
 
-    for(unsigned int i = 0; i <= num_asteroides - 1; ++i){
+    for(unsigned int i = 0; i <= num_asteroides - 1; ++i)
+    {
         double pos_x = xdist(semilla);
         double pos_y = ydist(semilla);
         double masa = mdist(semilla);
@@ -76,30 +77,35 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_
     Recibe el número de planetas introducidos y el valor de la semilla para la inicialización aleatoria.
     Devuelve un vector de planetas con las posiciones X e Y y las masas ya definidas.
 */
-vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem){
+vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
+{
     vector<Planeta> planetas_vect;
     default_random_engine semilla{val_sem};
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
 
-    for(unsigned int i = 0;i <= num_planetas - 1; ++i){
-
+    for(unsigned int i = 0;i <= num_planetas - 1; ++i)
+    {
         /* Colocación de los planetas en los laterales del marco de forma uniformemente distribuida */
-        if(i % 1 == 0){
+        if(i % 1 == 0)
+        {
             pos_x = 0.0;
             pos_y = ydist(semilla);
         }
 
-        if(i % 2 == 0){
+        if(i % 2 == 0)
+        {
             pos_x = xdist(semilla);
             pos_y = 0.0;
         }
 
-        if(i % 3 == 0){
+        if(i % 3 == 0)
+        {
             pos_x = ANCHURA;
             pos_y = ydist(semilla);
         }
 
-        if(i % 4 == 0){
+        if(i % 4 == 0)
+        {
             pos_x = xdist(semilla);
             pos_y = ALTURA;
         }
@@ -110,6 +116,7 @@ vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem){
         Planeta planeta(pos_x, pos_y, masa);
         planetas_vect.push_back(planeta);
     }
+
     return planetas_vect;
 }
 
@@ -124,7 +131,8 @@ vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem){
 */
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
-                   unsigned int num_planetas, unsigned int semilla){
+                   unsigned int num_planetas, unsigned int semilla)
+{
     /* Preparación para la escritura del archivo */
     ofstream initconf;
     initconf.open (init_file_path, ios::out | ios::binary);
@@ -135,14 +143,16 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
     initconf << num_asteroides << " " <<  num_iteraciones << " " <<  num_planetas << " " <<  semilla << "\n";
 
     /* Escritura de info de los asteroides */
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i){
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
         Asteroide a = asteroides.at(i);
         initconf << a.get_pos_x() << " " <<  a.get_pos_y() << " " <<  a.get_masa() << "\n";
     }
 
     /* Escritura de info de los planetas */
-    for(size_t i = 0; i <= planetas.size() - 1; ++i){
-        Planeta planeta = planetas.at(i);
+    for(size_t j = 0; j <= planetas.size() - 1; ++j)
+    {
+        Planeta planeta = planetas.at(j);
         initconf << planeta.get_pos_x() << " " <<  planeta.get_pos_y() << " " <<  planeta.get_masa() << "\n";
     }
 
@@ -157,7 +167,8 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
     No devuelve nada.
 */
 void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
-                   unsigned int iteration){
+                   unsigned int iteration)
+{
     /* Preparación para la escritura del archivo */
     ofstream initconf;
     initconf.open (step_file_path, ios::out | ios::app | ios::binary);
@@ -167,23 +178,27 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
     initconf << "*******ITERATION " << (iteration + 1) << "*******\n";
 
     /* Escritura de las fuerzas de cada asteroide en cada iteración */
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i){
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
         Asteroide asteroide = asteroides.at(i);
         initconf << "--- asteroid " << i << " vs asteroids ---\n";
         
         /* Escritura de asteroide vs asteroides */
-        for(size_t j = 0; j <= asteroides.size() - 1; ++j){
+        for(size_t j = 0; j <= asteroides.size() - 1; ++j)
+        {
             initconf << i << " " << j << " " << asteroide.get_fuerzas_x()[j] << 
             " " << asteroide.get_ang_influencia()[j] << "\n";
-         }
+        }
         
         /* Escritura de asteroide vs planetas */
         initconf << "--- asteroid " << i << " vs planets ---\n";
-        for(size_t k = 0; k <= planetas.size() - 1; ++k){
+        for(size_t k = 0; k <= planetas.size() - 1; ++k)
+        {
            initconf << i << " " << k << " " << asteroide.get_fuerzas_x()[k + asteroides.size()] <<
            " " << asteroide.get_ang_influencia()[k + asteroides.size()] << "\n";
         }
     }
+
     initconf.close();
 }
 
@@ -192,7 +207,8 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
     Recibe el path para al archivo out.txt y los vectores con la info de los ateroides.
     No devuelve nada.
 */
-void gen_out_file(string out_file_path, vector<Asteroide> asteroides){
+void gen_out_file(string out_file_path, vector<Asteroide> asteroides)
+{
     /* Preparación para la escritura del archivo */
     ofstream initconf;
     initconf.open (out_file_path, ios::out | ios::binary);
@@ -200,7 +216,8 @@ void gen_out_file(string out_file_path, vector<Asteroide> asteroides){
     initconf << std::setprecision(3);
 
     /* Escritura de la posición final de los asteroides */
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i){
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
         Asteroide asteroide = asteroides.at(i);
         initconf << asteroide.get_pos_x() << " " <<  asteroide.get_pos_y() << " " <<
         asteroide.get_vel_x() << " " << asteroide.get_vel_y()  << " " <<  asteroide.get_masa() << "\n";
@@ -214,7 +231,8 @@ void gen_out_file(string out_file_path, vector<Asteroide> asteroides){
     No devuelve nada.
 */
 void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
-                   duration<double> duracion_ejecucion, duration<double> duracion_media_iteracion){
+                   duration<double> duracion_ejecucion, duration<double> duracion_media_iteracion)
+{
     /* Preparación para la escritura del archivo */
     ofstream initconf;
     initconf.open (out_file_path, ios::out | ios::app | ios::binary);
@@ -229,13 +247,15 @@ void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides
     Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
     No devuelve nada.
 */
-void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas){
+void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas)
+{
     /* Reset de las distancias respecto a asteroides y planetas*/
     asteroide.clear_dists_asteroides();
     asteroide.clear_dists_planetas();
 
     /* Cálculo de la distancia con los demás asteroides */
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i){
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
         Asteroide asteroide_tmp = asteroides[i];
         double dist = sqrt(pow((asteroide.get_pos_x() - asteroide_tmp.get_pos_x()), 2) +
                            pow((asteroide.get_pos_y() - asteroide_tmp.get_pos_y()), 2));
@@ -243,7 +263,8 @@ void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<
     }
 
     /* Cálculo de la distancia con los demás planetas */
-    for(size_t j = 0; j <= planetas.size() - 1; ++j){
+    for(size_t j = 0; j <= planetas.size() - 1; ++j)
+    {
         Planeta planeta_temp = planetas[j];
         double dist = sqrt(pow((asteroide.get_pos_x() - planeta_temp.get_pos_x()), 2) +
                            pow((asteroide.get_pos_y() - planeta_temp.get_pos_y()), 2));
@@ -256,15 +277,16 @@ void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<
     Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
     No devuelve nada.
 */
-void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas){
+void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas)
+{
     vector<double> pendiente = asteroide.get_pendiente();
 
     /* Reset de movimientos normales*/
     asteroide.clear_movs_normales();
 
     /* Cálculo del movimiento normal provocado en un asteroide por los demás */
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i){
-
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
         /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la pendiente es ignorada */
         if(asteroide.get_dist_asteroides()[i] >= DISTMIN){
             /* Cálculo de pendiente */
@@ -272,44 +294,54 @@ void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vect
             (asteroide.get_pos_x() - asteroides[i].get_pos_x());
             
             /* Correción antes de almacenar */
-            if (pendiente_gen > 1){
+            if (pendiente_gen > 1)
+            {
                 pendiente_gen = 1;
-            } else if (pendiente_gen < -1){
+            } else if (pendiente_gen < -1)
+            {
                 pendiente_gen = -1;
             }
 
             /* Comprobamos que es un número correcto */
-            if(isnan(pendiente_gen) > 0){
+            if(isnan(pendiente_gen) > 0)
+            {
                 pendiente_gen = 0.0;
             }
+
             asteroide.add_pendiente(pendiente_gen);
+
             /* Cálculo del ángulo con la arcotangente */
             asteroide.add_ang_influencia(atan(pendiente_gen));
         }
     }
 
     /* Cálculo del movimiento normal provocado en un asteroide por los planetas */
-    for(size_t i = 0; i <= planetas.size() - 1; ++i){
-        
+    for(size_t j = 0; j <= planetas.size() - 1; ++j)
+    {
         /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la pendiente es ignorada */  
-        if(asteroide.get_dist_planetas()[i] >= DISTMIN){
+        if(asteroide.get_dist_planetas()[j] >= DISTMIN)
+        {
             /* Cálculo de pendiente */
-            double pendiente_gen2 = (asteroide.get_pos_y() - planetas[i].get_pos_y()) /
-            (asteroide.get_pos_x() - planetas[i].get_pos_x());
+            double pendiente_gen2 = (asteroide.get_pos_y() - planetas[j].get_pos_y()) /
+            (asteroide.get_pos_x() - planetas[j].get_pos_x());
             
             /* Correción antes de almacenar */
-            if (pendiente_gen2 > 1){
+            if (pendiente_gen2 > 1)
+            {
                 pendiente_gen2 = 1;
-            } else if (pendiente_gen2 < -1){
+            } else if (pendiente_gen2 < -1)
+            {
                 pendiente_gen2 = -1;
             }
 
             /* Comprobamos que es un número */
-            if(isnan(pendiente_gen2) > 0){
+            if(isnan(pendiente_gen2) > 0)
+            {
                 pendiente_gen2 = 0.0;
             }
 
             asteroide.add_pendiente(pendiente_gen2);
+
             /* Cálculo del ángulo con la arcotangente */
             asteroide.add_ang_influencia(atan(pendiente_gen2));
         }
@@ -317,101 +349,80 @@ void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vect
 }
 
 
-/* Cálculos de fuerzas */
-
-/* Cálculo de fuerzas de atracción X sobre un asteroide ejercicas por los demás asteroides y planetas
+/* Cálculo de fuerzas de atracción X e Y sobre un asteroide ejercicas por los demás asteroides y planetas
     y actualización de su info.
+    Unificados X e Y en una sola función para poder aplicar optimización de fusión de arrays.
     Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
     No devuelve nada.
 */
-void calc_fuerzas_x(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas){
+void calc_fuerzas(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas)
+{
     /* Obtención de distancias */
     vector<double> dists_asteroides = asteroide.get_dist_asteroides();
     vector<double> dists_planetas = asteroide.get_dist_planetas();
     vector<double> angs_influencia = asteroide.get_ang_influencia();
     
-    /* Reset de fuerzas X */
+    /* Reset de fuerzas */
     asteroide.clear_fuerzas_x();
-
-    /* Cálculo de componentes X de la fuerza de atracción sobre un asteroide ejercida por los demás */
-    for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i){
-        double fuerza_x;
-
-        /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la fuerza es ignorada (nula) */
-        if(asteroide.get_dist_asteroides()[i] < DISTMIN){
-            fuerza_x = 0.0;
-        } else {
-            fuerza_x = ((GRAVITY * asteroide.get_masa() * asteroides[i].get_masa()) /
-                         pow(asteroide.get_dist_asteroides()[i], 2)) * cos(angs_influencia[i]);
-            asteroide.add_fuerza_x(fuerza_x);
-        }
-
-        /* Comprobación de fuerzas superiors a 100 */
-        if (fuerza_x > 100.0){
-            fuerza_x = 100.0;
-        }
-
-        asteroide.add_fuerza_x(fuerza_x);
-    }
-
-    /* Cálculo de de componentes X de la fuerza de atracción sobre un asteroide ejercida por los planetas */
-    for(size_t i = 0; i <= dists_planetas.size() - 1; ++i){
-        double fuerza_x = ((GRAVITY * asteroide.get_masa() * planetas[i].get_masa()) /
-        pow(asteroide.get_dist_planetas()[i], 2)) * cos(angs_influencia[i + asteroides.size()]);
-        
-        /* Comprobación de fuerzas superiors a 100 */        
-        if (fuerza_x > 100.0){
-            fuerza_x = 100.0;
-        }
-
-        asteroide.add_fuerza_x(fuerza_x);
-    }
-}
-
-
-/* Cálculo de fuerzas de atracción Y sobre un asteroide ejercicas por los demás asteroides
-    y planetas y actualización de su info.
-    Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
-    No devuelve nada.
-*/
-void calc_fuerzas_y(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas){
-    vector<double> dists_asteroides = asteroide.get_dist_asteroides();
-    vector<double> dists_planetas = asteroide.get_dist_planetas();
-    vector<double> ang_influencia = asteroide.get_ang_influencia();
-
-    /* Reset de fuerzas Y */
     asteroide.clear_fuerzas_y();
 
-    /* Cálculo de componentes Y de la fuerza de atracción sobre un asteroide ejercida por los demás */
-    for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i){       
+    /* Cálculo de componentes X de la fuerza de atracción sobre un asteroide ejercida por los demás */
+    for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i)
+    {
+        double fuerza_x;
         double fuerza_y;
 
         /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la fuerza es ignorada (nula) */
-        if(asteroide.get_dist_asteroides()[i] < DISTMIN){
+        if(asteroide.get_dist_asteroides()[i] < DISTMIN)
+        {
+            fuerza_x = 0.0;
             fuerza_y = 0.0;
-        } else {
+        } else
+        {
+            fuerza_x = ((GRAVITY * asteroide.get_masa() * asteroides[i].get_masa()) /
+                         pow(asteroide.get_dist_asteroides()[i], 2)) * cos(angs_influencia[i]);
             fuerza_y = ((GRAVITY * asteroide.get_masa() * asteroides[i].get_masa()) /
-            pow(asteroide.get_dist_asteroides()[i], 2)) * sin(ang_influencia[i]);
+                         pow(asteroide.get_dist_asteroides()[i], 2)) * sin(angs_influencia[i]);
         }
 
         /* Comprobación de fuerzas superiors a 100 */
-        if (fuerza_y > 100.0){
+        if (fuerza_x > 100.0)
+        {
+            fuerza_x = 100.0;
+        }
+
+        if (fuerza_y > 100.0)
+        {
             fuerza_y = 100.0;
         }
 
+        asteroide.add_fuerza_x(fuerza_x);
         asteroide.add_fuerza_y(fuerza_y);
+
     }
 
-    /* Cálculo de componentes Y de la fuerza de atracción sobre un asteroide ejercida por los planetas */
-    for(size_t i = 0; i <= dists_planetas.size() - 1; ++i){
-        double fuerza_y = ((GRAVITY * asteroide.get_masa() * planetas[i].get_masa()) /
-        pow(asteroide.get_dist_planetas()[i], 2)) * sin(ang_influencia[i + asteroides.size()]);
+    /* Cálculo de de componentes X de la fuerza de atracción sobre un asteroide ejercida por los planetas */
+    for(size_t j = 0; j <= dists_planetas.size() - 1; ++j)
+    {
+        double fuerza_x = ((GRAVITY * asteroide.get_masa() * planetas[j].get_masa()) /
+                            pow(asteroide.get_dist_planetas()[j], 2)) *
+                            cos(angs_influencia[j + asteroides.size()]);
+        double fuerza_y = ((GRAVITY * asteroide.get_masa() * planetas[j].get_masa()) /
+                            pow(asteroide.get_dist_planetas()[j], 2)) *
+                             sin(angs_influencia[j + asteroides.size()]);
+        
+        /* Comprobación de fuerzas superiors a 100 */        
+        if (fuerza_x > 100.0)
+        {
+            fuerza_x = 100.0;
+        }
 
-        /* Comprobación de fuerzas superiors a 100 */
-        if (fuerza_y > 100.0){
+        if (fuerza_y > 100.0)
+        {
             fuerza_y = 100.0;
         }
-        
+
+        asteroide.add_fuerza_x(fuerza_x);
         asteroide.add_fuerza_y(fuerza_y);
     }
 }
@@ -421,7 +432,8 @@ void calc_fuerzas_y(Asteroide& asteroide, vector<Asteroide> asteroides, vector<P
     Recibe el asteroide a evaluar.
     No devuelve nada.
 */
-void calc_mov_asteroide(Asteroide& asteroide){
+void calc_mov_asteroide(Asteroide& asteroide)
+{
     vector<double> fuerzas_x = asteroide.get_fuerzas_x();
     vector<double> fuerzas_y = asteroide.get_fuerzas_y();
 
@@ -478,7 +490,8 @@ void calc_mov_asteroide(Asteroide& asteroide){
     Recibe el asteroide a evaluar.
     No devuelve nada.
 */
-void calc_rebote_pared(Asteroide& asteroide){
+void calc_rebote_pared(Asteroide& asteroide)
+{
     double pos_x = asteroide.get_pos_x();
     double pos_y = asteroide.get_pos_y();
 
@@ -510,25 +523,29 @@ void calc_rebote_pared(Asteroide& asteroide){
     Recibe el vector de asteroides.
     No devuelve nada.
 */
-void calc_rebote_asteroides(vector<Asteroide> asteroides){
+void calc_rebote_asteroides(vector<Asteroide> asteroides)
+{
     /* Copia temporal de vector asteroides para no perder las velocidades antes de los cambios */
     vector<Asteroide> asteroides_temp_copy;  
 
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i){
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
         Asteroide *asteroide_orig = &asteroides[i];
         Asteroide *asteroide_temp = clonar_asteroide(*asteroide_orig);        
         asteroides_temp_copy.push_back(*asteroide_temp);
     }
 
     /* Cálculo de intercambio de velocidades de los asteroides si estos rebotan (dist <= DISTMIN) */
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i){
+    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    {
 
-        for(size_t j = 0; j <= asteroides_temp_copy.size() - 1; ++j){
-
+        for(size_t j = 0; j <= asteroides_temp_copy.size() - 1; ++j)
+        {
             /* Comprueba que la distancia es menor a la mínima y que no está comparando el asteroide consigo mismo */
             if(asteroides_temp_copy[i].get_dist_asteroides().at(j) < DISTMIN &&
                asteroides[i].get_pos_x() != asteroides_temp_copy[j].get_pos_x() &&
-               asteroides[i].get_pos_y() != asteroides_temp_copy[j].get_pos_y()){
+               asteroides[i].get_pos_y() != asteroides_temp_copy[j].get_pos_y())
+               {
                 cout << "REBOTE ENTRE ASTEROIDES " << i << " con pos " << asteroides[i].get_pos_x() <<
                 ", " << asteroides[i].get_pos_y() << " y " << j << " con pos " <<
                 asteroides_temp_copy[j].get_pos_x() << ", " << asteroides_temp_copy[j].get_pos_y() << endl;

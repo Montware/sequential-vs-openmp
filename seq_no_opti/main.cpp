@@ -35,7 +35,7 @@ using namespace std::chrono;
 /* Ejecución principal */
 int main(int argc, char const *argv[])
 {
-    cout << "Ejecutando nasteroides-seq no optimizado" << endl;
+    cout << "Ejecutando nasteroides-seq NO optimizado" << endl;
     int num_iteraciones;
     int num_asteroides;
     int num_planetas;
@@ -89,8 +89,7 @@ int main(int argc, char const *argv[])
                 {
                     calc_distancias(asteroides[j], asteroides, planetas);
                     calc_movs_normales(asteroides[j], asteroides, planetas);
-                    calc_fuerzas_x(asteroides[j], asteroides, planetas);
-                    calc_fuerzas_y(asteroides[j], asteroides, planetas);
+                    calc_fuerzas(asteroides[j], asteroides, planetas);
                     calc_mov_asteroide(asteroides[j]);
                     calc_rebote_pared(asteroides[j]);
                 }
@@ -104,7 +103,6 @@ int main(int argc, char const *argv[])
         }
     }
     
-
     /* Fin del temportizador para métrica de tiempo */
     high_resolution_clock::time_point program_end_time = high_resolution_clock::now();
 
