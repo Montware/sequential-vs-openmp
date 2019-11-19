@@ -81,7 +81,6 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_en
 vector<Planeta> init_planetas(unsigned int num_planetas, default_random_engine semilla_re)
 {
     vector<Planeta> planetas_vect;
-    //default_random_engine semilla{val_sem};
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
 
     for(unsigned int i = 0; i <= num_planetas - 1; ++i)
