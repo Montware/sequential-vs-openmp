@@ -8,7 +8,7 @@
 
 
 /* Constantes predefinidas de la simulación */
-#define GRAVITY 6.674E-5
+#define GRAVITY 6.674e-5
 #define PERIODO 0.1
 #define DISTMIN 5.0
 #define ANCHURA 200

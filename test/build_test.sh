@@ -7,32 +7,30 @@
 # numPlanetas = 8;
 # semilla = 100;
 
-if [ -f "nasteroids-seq" ]; then
-    rm -f nasteroids-seq
+# Borrado del step_by_step.txt proporcionado
+if [ -f "../seq2019-ref/step_by_step.txt" ]; then
+    rm -f ../seq2019-ref/step_by_step.txt
 fi  
-if [ -f "init_conf.txt" ]; then
-    rm -f init_conf.txt
+
+# Reset de los tests.csv
+if [ -f "../seq_no_opti/tests.csv" ]; then
+    rm -f ../seq_no_opti/tests.csv
 fi  
-if [ -f "out.txt" ]; then
-    rm -f out.txt
+
+if [ -f "../seq/tests.csv" ]; then
+    rm -f ../seq/tests.csv
 fi  
+
+if [ -f "../par/tests.csv" ]; then
+    rm -f ../par/tests.csv/media/dev/DATA/CLOUD/0_MEGA_UC3M/WS/'VISUAL STUDIO'/UNI/ARCOS/sequential-vs-openmp
+fi  
+
 clear
 
-# TODO: (ver enunciado) preparar tests, añadiendo los tiempos des del programa original propio
-# En el programa de referencia de aula global debe escribir por separado los tiempos
 
-printf "\nCompilando programa:\n"  
-g++ launch_tests.cpp -o launch_tests -std=c++14 -O3 -DNDEBUG -Wall -Wextra -Wno-deprecated -Werror -pedantic -pedantic-errors -g
-
-
-./launch_tests 10 250 5 2000
-
-# To debug: g++ main.cpp -o nasteroids-seq -std=c++14 -Wall -Wextra -Wno-deprecated -Werror -pedantic -pedantic-errors -g
-g++ main.cpp -o nasteroids-seq -std=c++14 -Wall -Wextra -Wno-deprecated -Werror -pedantic -pedantic-errors -g -DNDEBUG
-#./nasteroids2018-base_v20 5 2 8 100
-
-#valgrind --tool=cachegrind --cachegrind-out-file=vgrind_seq_out --I1=16384,8,32 --LL=131072,8,64 --branch-sim=yes ./nasteroids-seq 5 2 8 100
-#cg_annotate vgrind_seq_out --auto=yes
-
-printf "\nEjecutando programa:\n"  
-./nasteroids-seq 10 250 5 2000
+printf "\nEjecutando tests de los programas:\n"  
+#../seq2019-ref/build.sh 10 250 5 2000
+../seq2019-ref/build.sh
+../seq_no_opti/build.sh
+../seq/build.sh
+../par/build.sh

@@ -17,8 +17,9 @@ using namespace std;
 using namespace std::chrono;
 
 /* Definicion de constantes del proyecto */
-#define GRAVITY 6.674E-5
+#define GRAVITY 6.674e-5
 #define PERIODO 0.1
+#define DISTMIN 5.0
 #define ANCHURA 200
 #define ALTURA 200
 #define MEDIADISTRIBUCIONMASAS 1000
@@ -32,10 +33,16 @@ using namespace std::chrono;
 
 
 
+/* Predeclaración de funciones */
+void print_program_info(int num_asteroides, int num_iteraciones, string init_fpath,
+                        string out_fpath, int num_planetas, int semilla, double gravity,
+                        double delta, double min_dist, int anchura, int altura);
+
+
 /* Ejecución principal */
 int main(int argc, char const *argv[])
 {
-    cout << "Ejecutando nasteroides-seq NO optimizado" << endl;
+    //cout << "Ejecutando nasteroides-seq NO optimizado" << endl;
     int num_iteraciones;
     int num_asteroides;
     int num_planetas;
@@ -69,6 +76,10 @@ int main(int argc, char const *argv[])
             printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
             exit(EXIT_FAILURE);
         } else {
+            /* Impresión por pantalla d ela información del programa */
+            print_program_info(num_asteroides, num_iteraciones, INITFILE, OUTFILE, num_planetas,
+                               semilla, GRAVITY, PERIODO, DISTMIN, ANCHURA, ALTURA);
+                               
             /* Paso 1 (inicial) */
             /* Preparación de los vectores de objetos para el programa y generaciónd e datos y archivo init_config.txt */
             vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla);
@@ -121,5 +132,26 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
+
+
+/* Función de impresión de la información de la ejecución */
+void print_program_info(int num_asteroides, int num_iteraciones, string init_fpath,
+                        string out_fpath, int num_planetas, int semilla, double gravity, double delta, double min_dist, int anchura, int altura){
+    cout << "Execution setup" << endl;
+    cout << "\nNumber of bodies: " << num_asteroides << endl;
+    cout << "Number of iterations: " << num_iteraciones << endl;
+    cout << "Initial file: " << init_fpath << endl;
+    cout << "Output file: " << out_fpath << endl;
+    cout << "Number of planets: " << num_planetas << endl;
+    cout << "Seed: " << semilla << endl;
+    cout << "\nNumber of bodies: " << num_asteroides << endl;
+    cout << "Gravity: " << gravity << endl;
+    cout << "Delta time: " << delta << endl;
+    cout << "Number of steps: " << num_iteraciones << endl;
+    cout << "Min. distance: " << min_dist << endl;
+    cout << "Width: " << anchura << endl;
+    cout << "Height: " << altura << endl;
+}
+
 
 

@@ -14,7 +14,7 @@ if [ -f "stepbystep.txt" ]; then
     rm -f stepbystep.txt
 fi  
 
-clear
+#clear
 
 printf "\nCompilando programa\n"  
 g++ main.cpp -o nasteroids-par -std=c++14 -O3 -DNDEBUG -Wall -fopenmp -Wextra -Wno-deprecated -Werror -pedantic -pedantic-errors -g
