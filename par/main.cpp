@@ -64,7 +64,7 @@ int main(int argc, char const *argv[])
     /* Comprobamos que hay 5 parámetros */
     if (argc != 5)
     {
-        printf("nasteroids-seq: Wrong arguments.\n");
+        printf("nasteroids-par: Wrong arguments.\n");
         printf("Correct use:\n");
         printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
         exit(EXIT_FAILURE);
@@ -78,7 +78,7 @@ int main(int argc, char const *argv[])
         /* Comprobamos ningún parámetro es negativo o semilla no positiva */
         if (num_asteroides < 0 || num_iteraciones < 0 || num_planetas < 0 || semilla <= 0)
         {
-            printf("nasteroids-seq: Wrong arguments.\n");
+            printf("nasteroids-par: Wrong arguments.\n");
             printf("Correct use:\n");
             printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
             exit(EXIT_FAILURE);
@@ -87,10 +87,13 @@ int main(int argc, char const *argv[])
             print_program_info(num_asteroides, num_iteraciones, INITFILE, OUTFILE, num_planetas,
                                semilla, GRAVITY, PERIODO, DISTMIN, ANCHURA, ALTURA);
             
+            /*Generación de semilla aleatoria*/
+            default_random_engine semilla_re{semilla};
+            
             /* Paso 1 (inicial) */
             /* Preparación de los vectores de objetos para el programa y generaciónd e datos y archivo init_config.txt */
-            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla);
-            vector<Planeta> planetas = init_planetas(num_planetas, semilla);
+            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla_re);
+            vector<Planeta> planetas = init_planetas(num_planetas, semilla_re);
             gen_init_file(INITFILE, asteroides, planetas, num_asteroides, num_iteraciones, num_planetas, semilla);
             vector<double> velocidades_finales_x;
             vector<double> velocidades_finales_y;
@@ -100,10 +103,14 @@ int main(int argc, char const *argv[])
 
             /* Paso 2 (cálculo del movimiento de asteroides) */
             /* Cálculo de fuerzas y movimientos y actualización de la info de asteroides en cada iteración */
+            
+            /* Paralelización 1A: Ordered */        // TODO: Revisar si borrar
             for (int i = 0; i <= num_iteraciones - 1; ++i)
             {   
                 /* Cálculos de cada asteroide en paralelo */
-                //#pragma omp parallel for ordered num_threads(n_threads) firstprivate(planetas)    // TODO: REVISAR Y SEGUIR POR AQUI                  
+                /* Paralelización 2A: for */
+                //#pragma omp parallel for ordered num_threads(n_threads) firstprivate(planetas)        // TODO: Borrar
+                #pragma omp parallel for num_threads(n_threads)
                 for (size_t j = 0; j <= asteroides.size() - 1; ++j)
                 {
                     calc_distancias(asteroides[j], asteroides, planetas);
@@ -128,7 +135,7 @@ int main(int argc, char const *argv[])
     /* Cálculo de tiempo medio de cada iteración */
     duration<double> duracion_ejecucion_loops = duration_cast<duration<double>>(program_end_time - loops_start_time);
     duration<double> duracion_media_iteracion = duracion_ejecucion_loops / num_iteraciones;
-    cout << "Tiempo medio de cada iteración = " << duracion_media_iteracion.count() << " segundos" << endl;
+    cout << "\nTiempo medio de cada iteración = " << duracion_media_iteracion.count() << " segundos" << endl;
 
     /* Cálculo de tiempo total del programa */
     duration<double> duracion_ejecucion = duration_cast<duration<double>>(program_end_time - program_start_time);

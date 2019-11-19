@@ -8,7 +8,7 @@
 # semilla = 100;
 
 ulimit -s unlimited
-#KMP_STACKSIZE = 1m ./nasteroids-par        // TODO: Ver si necesario
+#KMP_STACKSIZE = 1m ./nasteroids-par
 
 if [ -f "step_by_step.txt" ]; then
     rm -f step_by_step.txt

@@ -71,7 +71,7 @@ int main(int argc, char const *argv[])
         /* Comprobamos ningún parámetro es negativo o semilla no positiva */
         if (num_asteroides < 0 || num_iteraciones < 0 || num_planetas < 0 || semilla <= 0)
         {
-            printf("nasteroids-seq: Wrong arguments.\n");
+            printf("nasteroids-seq-no-opti: Wrong arguments.\n");
             printf("Correct use:\n");
             printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
             exit(EXIT_FAILURE);
@@ -79,11 +79,14 @@ int main(int argc, char const *argv[])
             /* Impresión por pantalla d ela información del programa */
             print_program_info(num_asteroides, num_iteraciones, INITFILE, OUTFILE, num_planetas,
                                semilla, GRAVITY, PERIODO, DISTMIN, ANCHURA, ALTURA);
+            
+            /*Generación de semilla aleatoria*/
+            default_random_engine semilla_re{semilla};
                                
             /* Paso 1 (inicial) */
             /* Preparación de los vectores de objetos para el programa y generaciónd e datos y archivo init_config.txt */
-            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla);
-            vector<Planeta> planetas = init_planetas(num_planetas, semilla);
+            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla_re);
+            vector<Planeta> planetas = init_planetas(num_planetas, semilla_re);
             gen_init_file(INITFILE, asteroides, planetas, num_asteroides, num_iteraciones, num_planetas, semilla);
             vector<double> velocidades_finales_x;
             vector<double> velocidades_finales_y;
@@ -120,7 +123,7 @@ int main(int argc, char const *argv[])
     /* Cálculo de tiempo medio de cada iteración */
     duration<double> duracion_ejecucion_loops = duration_cast<duration<double>>(program_end_time - loops_start_time);
     duration<double> duracion_media_iteracion = duracion_ejecucion_loops / num_iteraciones;
-    cout << "Tiempo medio de cada iteración = " << duracion_media_iteracion.count() << " segundos" << endl;
+    cout << "\nTiempo medio de cada iteración = " << duracion_media_iteracion.count() << " segundos" << endl;
 
     /* Cálculo de tiempo total del programa */
     duration<double> duracion_ejecucion = duration_cast<duration<double>>(program_end_time - program_start_time);

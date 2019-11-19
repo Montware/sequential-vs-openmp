@@ -7,6 +7,9 @@
 # numPlanetas = 8;
 # semilla = 100;
 
+if [ -f "nasteroids-seq" ]; then
+    rm -f nasteroids-seq
+fi 
 if [ -f "stepbystep.txt" ]; then
     rm -f stepbystep.txt
 fi  

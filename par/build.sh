@@ -10,6 +10,9 @@
 ulimit -s unlimited
 #KMP_STACKSIZE = 1m ./nasteroids-par        // TODO: Ver si necesario
 
+if [ -f "nasteroids-par" ]; then
+    rm -f nasteroids-par
+fi 
 if [ -f "stepbystep.txt" ]; then
     rm -f stepbystep.txt
 fi  
