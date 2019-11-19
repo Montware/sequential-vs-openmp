@@ -33,6 +33,7 @@ using namespace std::chrono;
 #define TESTFILE "tests.csv"
 
 
+
 /* Predeclaración de funciones */
 void print_program_info(int num_asteroides, int num_iteraciones, string init_fpath,
                         string out_fpath, int num_planetas, int semilla, double gravity,
