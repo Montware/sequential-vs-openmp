@@ -17,9 +17,8 @@ using namespace std;
 using namespace std::chrono;
 
 /* Definicion de constantes del proyecto */
-#define GRAVITY 6.674e-5
+#define GRAVITY 6.674E-5
 #define PERIODO 0.1
-#define DISTMIN 5.0
 #define ANCHURA 200
 #define ALTURA 200
 #define MEDIADISTRIBUCIONMASAS 1000
@@ -32,17 +31,15 @@ using namespace std::chrono;
 #define TESTFILE "tests.csv"
 
 
-
 /* Predeclaración de funciones */
 void print_program_info(int num_asteroides, int num_iteraciones, string init_fpath,
                         string out_fpath, int num_planetas, int semilla, double gravity,
                         double delta, double min_dist, int anchura, int altura);
 
-
 /* Ejecución principal */
 int main(int argc, char const *argv[])
 {
-    //cout << "Ejecutando nasteroides-seq NO optimizado" << endl;
+    cout << "Ejecutando nasteroides-seq optimizado" << endl;
     int num_iteraciones;
     int num_asteroides;
     int num_planetas;
@@ -57,7 +54,7 @@ int main(int argc, char const *argv[])
     /* Comprobamos que hay 5 parámetros */
     if (argc != 5)
     {
-        printf("nasteroids-seq-no-opti: Wrong arguments.\n");
+        printf("nasteroids-seq: Wrong arguments.\n");
         printf("Correct use:\n");
         printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
         exit(EXIT_FAILURE);
@@ -71,7 +68,7 @@ int main(int argc, char const *argv[])
         /* Comprobamos ningún parámetro es negativo o semilla no positiva */
         if (num_asteroides < 0 || num_iteraciones < 0 || num_planetas < 0 || semilla <= 0)
         {
-            printf("nasteroids-seq-no-opti: Wrong arguments.\n");
+            printf("nasteroids-seq: Wrong arguments.\n");
             printf("Correct use:\n");
             printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
             exit(EXIT_FAILURE);
@@ -80,13 +77,10 @@ int main(int argc, char const *argv[])
             print_program_info(num_asteroides, num_iteraciones, INITFILE, OUTFILE, num_planetas,
                                semilla, GRAVITY, PERIODO, DISTMIN, ANCHURA, ALTURA);
             
-            /*Generación de semilla aleatoria*/
-            default_random_engine semilla_re{semilla};
-                               
             /* Paso 1 (inicial) */
             /* Preparación de los vectores de objetos para el programa y generaciónd e datos y archivo init_config.txt */
-            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla_re);
-            vector<Planeta> planetas = init_planetas(num_planetas, semilla_re);
+            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla);
+            vector<Planeta> planetas = init_planetas(num_planetas, semilla);
             gen_init_file(INITFILE, asteroides, planetas, num_asteroides, num_iteraciones, num_planetas, semilla);
             vector<double> velocidades_finales_x;
             vector<double> velocidades_finales_y;
@@ -101,6 +95,7 @@ int main(int argc, char const *argv[])
                 /* Cálculos de cada asteroide */
                 for (size_t j = 0; j <= asteroides.size() - 1; ++j)
                 {
+                    //calc_distancias(asteroides[j], asteroides, planetas);
                     calc_distancias(asteroides[j], asteroides, planetas);
                     calc_movs_normales(asteroides[j], asteroides, planetas);
                     calc_fuerzas(asteroides[j], asteroides, planetas);
@@ -109,7 +104,7 @@ int main(int argc, char const *argv[])
                 }
 
                 calc_rebote_asteroides(asteroides);
-                gen_step_file(STEPSFILE, asteroides, planetas);
+                gen_step_file(STEPSFILE, asteroides, planetas, i);
             }
 
             // Acaba el programa imprimiendo el archivo de salida -- paso 3
@@ -123,7 +118,7 @@ int main(int argc, char const *argv[])
     /* Cálculo de tiempo medio de cada iteración */
     duration<double> duracion_ejecucion_loops = duration_cast<duration<double>>(program_end_time - loops_start_time);
     duration<double> duracion_media_iteracion = duracion_ejecucion_loops / num_iteraciones;
-    cout << "\nTiempo medio de cada iteración = " << duracion_media_iteracion.count() << " segundos" << endl;
+    cout << "Tiempo medio de cada iteración = " << duracion_media_iteracion.count() << " segundos" << endl;
 
     /* Cálculo de tiempo total del programa */
     duration<double> duracion_ejecucion = duration_cast<duration<double>>(program_end_time - program_start_time);
@@ -132,7 +127,6 @@ int main(int argc, char const *argv[])
     /* Almacenamiento de tiempos para los tests de evaluación con métrica */
     gen_test_file(TESTFILE, num_iteraciones, num_asteroides, num_planetas,
                   duracion_ejecucion.count(), duracion_media_iteracion.count());
-
     return 0;
 }
 
@@ -155,6 +149,4 @@ void print_program_info(int num_asteroides, int num_iteraciones, string init_fpa
     cout << "Width: " << anchura << endl;
     cout << "Height: " << altura << endl;
 }
-
-
 

@@ -30,7 +30,8 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
 void gen_out_file(string out_file_path, vector<Asteroide> asteroides);
 void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
                    double duracion_ejecucion, double duracion_media_iteracion);
-void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
+void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides);
+void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas);
 void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_fuerzas(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas);
 void calc_mov_asteroide(Asteroide& asteroide);
@@ -245,15 +246,14 @@ void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides
 }
 
 
-/* Cálculo de distancia entre un asteroide con los demás asteroides y planetas y actualización de su info.
+/* Cálculo de distancia entre un asteroide con los demás asteroides y actualización de su info.
     Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
     No devuelve nada.
 */
-void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas)
+void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
 {
-    /* Reset de las distancias respecto a asteroides y planetas*/
+    /* Reset de las distancias respecto a asteroides*/
     asteroide.clear_dists_asteroides();
-    asteroide.clear_dists_planetas();
 
     /* Cálculo de la distancia con los demás asteroides */
     for(size_t i = 0; i <= asteroides.size() - 1; ++i)
@@ -263,6 +263,17 @@ void calc_distancias(Asteroide& asteroide, vector<Asteroide> asteroides, vector<
                            pow((asteroide.get_pos_y() - asteroide_tmp.get_pos_y()), 2));
         asteroide.add_dist_asteroides(dist);
     }
+
+}
+
+/* Cálculo de distancia entre un asteroide con los planetas y actualización de su info.
+    Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
+    No devuelve nada.
+*/
+void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas)
+{
+    /* Reset de las distancias respecto a planetas*/
+    asteroide.clear_dists_planetas();
 
     /* Cálculo de la distancia con los demás planetas */
     for(size_t j = 0; j <= planetas.size() - 1; ++j)

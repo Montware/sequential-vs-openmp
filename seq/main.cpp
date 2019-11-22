@@ -95,7 +95,9 @@ int main(int argc, char const *argv[])
                 /* Cálculos de cada asteroide */
                 for (size_t j = 0; j <= asteroides.size() - 1; ++j)
                 {
-                    calc_distancias(asteroides[j], asteroides, planetas);
+                    //calc_distancias(asteroides[j], asteroides, planetas);
+                    calc_dists_asteroides(asteroides[j], asteroides);
+                    calc_dists_planetas(asteroides[j], planetas);
                     calc_movs_normales(asteroides[j], asteroides, planetas);
                     calc_fuerzas(asteroides[j], asteroides, planetas);
                     calc_mov_asteroide(asteroides[j]);
