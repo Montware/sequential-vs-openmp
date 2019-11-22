@@ -39,14 +39,6 @@ void calc_rebote_asteroides(vector<Asteroide> asteroides);
 Asteroide* clonar_asteroide(const Asteroide& orig);
 
 
-/* Funciones para generacion automática de valores (en base a una distribución y desviación)
-    de posicion (coordenadas X e Y) dentro de las dimensiones (200x200) del escenario de simulación.
-*/
-uniform_real_distribution<double> xdist(0.0, std::nextafter(ANCHURA,
-                                        std::numeric_limits<double>::max()));
-uniform_real_distribution<double> ydist(0.0, std::nextafter(ALTURA,
-                                        std::numeric_limits<double>::max()));
-normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
 
 
 /* Funciones de inicialización de los objetos */
@@ -58,7 +50,16 @@ normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
 vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem)
 {
     vector<Asteroide> asteroides_vect;
+
+    /* Funciones para generacion automática de valores (en base a una distribución y desviación)
+    de posicion (coordenadas X e Y) dentro de las dimensiones (200x200) del escenario de simulación.
+    */
     default_random_engine semilla{val_sem};
+    uniform_real_distribution<double> xdist(0.0, std::nextafter(ANCHURA,
+                                        std::numeric_limits<double>::max()));
+    uniform_real_distribution<double> ydist(0.0, std::nextafter(ALTURA,
+                                            std::numeric_limits<double>::max()));
+    normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
 
     for(unsigned int i = 0; i <= num_asteroides - 1; ++i)
     {
@@ -80,8 +81,14 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_
 vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
 {
     vector<Planeta> planetas_vect;
-    default_random_engine semilla{val_sem};
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
+    
+    default_random_engine semilla{val_sem};
+    uniform_real_distribution<double> xdist(0.0, std::nextafter(ANCHURA,
+                                    std::numeric_limits<double>::max()));
+    uniform_real_distribution<double> ydist(0.0, std::nextafter(ALTURA,
+                                            std::numeric_limits<double>::max()));
+    normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
 
     for(unsigned int i = 0;i <= num_planetas - 1; ++i)
     {
