@@ -4,11 +4,10 @@
 #include <iomanip>
 #include <chrono>
 #include <ctime>
-#include <iomanip>
 
 
 /* Constantes predefinidas de la simulación */
-#define GRAVITY 6.674e-5
+#define GRAVITY 6.674E-5
 #define PERIODO 0.1
 #define DISTMIN 5.0
 #define ANCHURA 200
@@ -22,8 +21,7 @@ using namespace std;
 using namespace std::chrono;
 
 /* Predeclaración de funciones */
-vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_engine semilla_re);
-vector<Planeta> init_planetas(unsigned int num_planetas, default_random_engine semilla_re);
+vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem);
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
                    unsigned int num_planetas, unsigned int semilla);
@@ -40,12 +38,11 @@ void calc_rebote_pared(Asteroide& asteroide);
 void calc_rebote_asteroides(vector<Asteroide> asteroides);
 Asteroide* clonar_asteroide(const Asteroide& orig);
 
-
 /* Funciones para generacion automática de valores (en base a una distribución y desviación)
-    de posicion (coordenadas X e Y) dentro de las dimensiones (200x200) del escenario de simulación.
+de posicion (coordenadas X e Y) dentro de las dimensiones (200x200) del escenario de simulación.
 */
 uniform_real_distribution<double> xdist(0.0, std::nextafter(ANCHURA,
-                                        std::numeric_limits<double>::max()));
+                                    std::numeric_limits<double>::max()));
 uniform_real_distribution<double> ydist(0.0, std::nextafter(ALTURA,
                                         std::numeric_limits<double>::max()));
 normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
@@ -57,15 +54,17 @@ normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
     Recibe el número de asteroides introducidos y el valor de la semilla para la inicialización aleatoria.
     Devuelve un vector de asteroides con las posiciones X e Y y las masas ya definidas.
  */
-vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_engine semilla_re)
+vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem)
 {
     vector<Asteroide> asteroides_vect;
 
+    default_random_engine semilla{val_sem};
+
     for(unsigned int i = 0; i <= num_asteroides - 1; ++i)
     {
-        double pos_x = xdist(semilla_re);
-        double pos_y = ydist(semilla_re);
-        double masa = mdist(semilla_re);
+        double pos_x = xdist(semilla);
+        double pos_y = ydist(semilla);
+        double masa = mdist(semilla);
         Asteroide asteroide(pos_x, pos_y, masa);
         asteroides_vect.push_back(asteroide); 
     }
@@ -78,40 +77,42 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_en
     Recibe el número de planetas introducidos y el valor de la semilla para la inicialización aleatoria.
     Devuelve un vector de planetas con las posiciones X e Y y las masas ya definidas.
 */
-vector<Planeta> init_planetas(unsigned int num_planetas, default_random_engine semilla_re)
+vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
 {
     vector<Planeta> planetas_vect;
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
+    
+    default_random_engine semilla{val_sem};
 
-    for(unsigned int i = 0; i <= num_planetas - 1; ++i)
+    for(unsigned int i = 0;i <= num_planetas - 1; ++i)
     {
-        /* Colocación de los planetas en los laterales del marco de forma repartida */
+        /* Colocación de los planetas en los laterales del marco de forma uniformemente distribuida */
         if(i % 4 == 0)
         {
             pos_x = 0.0;
-            pos_y = ydist(semilla_re);
+            pos_y = ydist(semilla);
         }
 
         if(i % 4 == 1)
         {
-            pos_x = xdist(semilla_re);
+            pos_x = xdist(semilla);
             pos_y = 0.0;
         }
 
         if(i % 4 == 2)
         {
             pos_x = ANCHURA;
-            pos_y = ydist(semilla_re);
+            pos_y = ydist(semilla);
         }
 
         if(i % 4 == 3)
         {
-            pos_x = xdist(semilla_re);
+            pos_x = xdist(semilla);
             pos_y = ALTURA;
         }
 
         /* Mayoración x10 de la masa de los planetas */
-        masa = mdist(semilla_re) * 10;
+        masa = mdist(semilla) * 10;
 
         Planeta planeta(pos_x, pos_y, masa);
         planetas_vect.push_back(planeta);
@@ -166,7 +167,8 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
     planetas, y los parámetros de ejecución del programa.
     No devuelve nada.
 */
-void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas)
+void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
+                   unsigned int iteration)
 {
     /* Preparación para la escritura del archivo */
     ofstream initconf;
@@ -174,37 +176,29 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
     initconf << std::fixed;
     initconf << std::setprecision(3);
 
+    initconf << "*******ITERATION " << (iteration + 1) << "*******\n";
+
     /* Escritura de las fuerzas de cada asteroide en cada iteración */
-    /* Escritura de asteroide vs asteroides */
-    initconf << "--- asteroids vs asteroids ---\n";
     for(size_t i = 0; i <= asteroides.size() - 1; ++i)
     {
         Asteroide asteroide = asteroides.at(i);
+        initconf << "--- asteroid " << i << " vs asteroids ---\n";
         
+        /* Escritura de asteroide vs asteroides */
         for(size_t j = 0; j <= asteroides.size() - 1; ++j)
         {
-            if (j > i)
-            {
-                initconf << i << " " << j << " " << std::fixed << std::setprecision(6) << asteroide.get_fuerzas_x()[j] << 
-                " " << std::fixed << std::setprecision(6) << asteroide.get_ang_influencia()[j] << "\n";
-            }
+            initconf << i << " " << j << " " << asteroide.get_fuerzas_x()[j] << 
+            " " << asteroide.get_ang_influencia()[j] << "\n";
         }
-    }
-    
-    /* Escritura de asteroide vs planetas */
-    initconf << "--- asteroids vs planets ---\n";
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
-    {
-        Asteroide asteroide = asteroides.at(i);
-
+        
+        /* Escritura de asteroide vs planetas */
+        initconf << "--- asteroid " << i << " vs planets ---\n";
         for(size_t k = 0; k <= planetas.size() - 1; ++k)
         {
-           initconf << i << " " << k << " " << std::fixed << std::setprecision(6) << asteroide.get_fuerzas_x()[k + asteroides.size()] <<
-           " " << std::fixed << std::setprecision(6) << asteroide.get_ang_influencia()[k + asteroides.size()] << "\n";
+           initconf << i << " " << k << " " << asteroide.get_fuerzas_x()[k + asteroides.size()] <<
+           " " << asteroide.get_ang_influencia()[k + asteroides.size()] << "\n";
         }
     }
-
-    initconf << "\n******************** ITERATION ********************\n";
 
     initconf.close();
 }
@@ -359,13 +353,12 @@ void calc_movs_normales(Asteroide& asteroide, vector<Asteroide> asteroides, vect
 
 /* Cálculo de fuerzas de atracción X e Y sobre un asteroide ejercicas por los demás asteroides y planetas
     y actualización de su info.
-    Unificados X e Y en una sola función para poder aplicar optimización de fusión de arrays.
     Recibe el asteroide a evaluar, un vector con todos los asteroides y otro con los planetas.
     No devuelve nada.
 */
 void calc_fuerzas(Asteroide& asteroide, vector<Asteroide> asteroides, vector<Planeta> planetas)
 {
-    /* Obtención de distancias */
+    /* Obtención de distancias */    
     vector<double> dists_asteroides = asteroide.get_dist_asteroides();
     vector<double> dists_planetas = asteroide.get_dist_planetas();
     vector<double> angs_influencia = asteroide.get_ang_influencia();
@@ -449,13 +442,11 @@ void calc_mov_asteroide(Asteroide& asteroide)
     asteroide.set_fuerza_tot_x(0.0);
     asteroide.set_fuerza_tot_y(0.0);
 
-    /* Sumatorio de las fuerzas totales X */
-    for(size_t i = 0; i <= fuerzas_x.size() - 1; ++i){
+    /* Optimización B1: Fusión de bucles*/
+    /* Sumatorio de las fuerzas totales X e Y optimizado */
+    for(size_t i = 0; i <= fuerzas_x.size() - 1 && i <= fuerzas_y.size() - 1; ++i)
+    {
         asteroide.set_fuerza_tot_x(asteroide.get_fuerza_tot_x() + fuerzas_x[i]);
-    }
-
-    /* Sumatorio de las fuerzas totales Y */
-    for(size_t i = 0; i <= fuerzas_y.size() - 1; ++i){
         asteroide.set_fuerza_tot_y(asteroide.get_fuerza_tot_y() + fuerzas_y[i]);
     }
 
