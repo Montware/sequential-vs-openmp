@@ -16,4 +16,4 @@ fi
 
 
 # Ejecutando programa
-./nasteroids2019 5 2 1 2000
+./nasteroids2019 5 2 5 2000

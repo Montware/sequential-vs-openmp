@@ -61,12 +61,14 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_en
 {
     vector<Asteroide> asteroides_vect;
 
+    //#pragma omp parallel for ordered
     for(unsigned int i = 0; i <= num_asteroides - 1; ++i)
     {
         double pos_x = xdist(semilla_re);
         double pos_y = ydist(semilla_re);
         double masa = mdist(semilla_re);
         Asteroide asteroide(pos_x, pos_y, masa);
+        //#pragma omp ordered
         asteroides_vect.push_back(asteroide); 
     }
 

@@ -9,7 +9,6 @@
 #include <math.h>
 #include <chrono>
 #include <ctime>
-#include <omp.h>
 #endif
 
 #include "metodos.h"
@@ -43,18 +42,11 @@ void print_program_info(int num_asteroides, int num_iteraciones, string init_fpa
 /* Ejecución principal */
 int main(int argc, char const *argv[])
 {
+    //cout << "Ejecutando nasteroides-seq optimizado" << endl;
     int num_iteraciones;
     int num_asteroides;
     int num_planetas;
 
-    /* Configuración para procesamientos en paralelo */
-    omp_set_nested(1);
-    int n_threads = omp_get_max_threads();
-    cout << "Numero maximo de nucleos = " << n_threads << endl;     // TODO: Comentar
-
-
-    //cout << "Ejecutando nasteroides-par optimizado" << endl;
-    //double t1 = omp_get_wtime();      // TODO: Sustituir chronos por omp_get_wtime
 
     /* Inicio del temportizador para métrica de tiempo del programa*/
     high_resolution_clock::time_point program_start_time = high_resolution_clock::now();
@@ -65,7 +57,7 @@ int main(int argc, char const *argv[])
     /* Comprobamos que hay 5 parámetros */
     if (argc != 5)
     {
-        printf("nasteroids-par: Wrong arguments.\n");
+        printf("nasteroids-seq: Wrong arguments.\n");
         printf("Correct use:\n");
         printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
         exit(EXIT_FAILURE);
@@ -76,25 +68,23 @@ int main(int argc, char const *argv[])
         num_planetas = stoi(argv[3]);
         int semilla = stoi(argv[4]);
 
+
         /* Comprobamos ningún parámetro es negativo o semilla no positiva */
         if (num_asteroides < 0 || num_iteraciones < 0 || num_planetas < 0 || semilla <= 0)
         {
-            printf("nasteroids-par: Wrong arguments.\n");
+            printf("nasteroids-seq: Wrong arguments.\n");
             printf("Correct use:\n");
             printf("nasteroids-seq num_asteroides num_iteraciones num_planetas semilla\n");
             exit(EXIT_FAILURE);
         } else {
-            /* Impresión por pantalla d ela información del programa */
-            print_program_info(num_asteroides, num_iteraciones, INITFILE, OUTFILE, num_planetas,
-                               semilla, GRAVITY, PERIODO, DISTMIN, ANCHURA, ALTURA);
-            
+
             /*Generación de semilla aleatoria*/
-            default_random_engine semilla_re{semilla};
-            
-            /* Paso 1 (inicial) */
+            //default_random_engine semilla_re{semilla};
+                   
+            /* Paso 1 (inicial) */          
             /* Preparación de los vectores de objetos para el programa y generaciónd e datos y archivo init_config.txt */
-            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla_re);
-            vector<Planeta> planetas = init_planetas(num_planetas, semilla_re);
+            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla);
+            vector<Planeta> planetas = init_planetas(num_planetas, semilla);
             gen_init_file(INITFILE, asteroides, planetas, num_asteroides, num_iteraciones, num_planetas, semilla);
             vector<double> velocidades_finales_x;
             vector<double> velocidades_finales_y;
@@ -104,14 +94,9 @@ int main(int argc, char const *argv[])
 
             /* Paso 2 (cálculo del movimiento de asteroides) */
             /* Cálculo de fuerzas y movimientos y actualización de la info de asteroides en cada iteración */
-            
-            /* Paralelización 1A: Ordered */        // TODO: Revisar si borrar
             for (int i = 0; i <= num_iteraciones - 1; ++i)
             {   
-                /* Cálculos de cada asteroide en paralelo */
-                /* Paralelización 2A: for */
-                //#pragma omp parallel for ordered num_threads(n_threads) firstprivate(planetas)        // TODO: Borrar
-                #pragma omp parallel for num_threads(n_threads)
+                /* Cálculos de cada asteroide */
                 for (size_t j = 0; j <= asteroides.size() - 1; ++j)
                 {
                     calc_distancias(asteroides[j], asteroides, planetas);
@@ -145,7 +130,6 @@ int main(int argc, char const *argv[])
     /* Almacenamiento de tiempos para los tests de evaluación con métrica */
     gen_test_file(TESTFILE, num_iteraciones, num_asteroides, num_planetas,
                   duracion_ejecucion.count(), duracion_media_iteracion.count());
-
     return 0;
 }
 
@@ -168,6 +152,4 @@ void print_program_info(int num_asteroides, int num_iteraciones, string init_fpa
     cout << "Width: " << anchura << endl;
     cout << "Height: " << altura << endl;
 }
-
-
 
