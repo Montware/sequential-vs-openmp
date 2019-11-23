@@ -25,8 +25,9 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
                    unsigned int num_planetas, unsigned int semilla);
-void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
-                   unsigned int iteration);
+void gen_test_file(string out_file_path, string type, int num_iteraciones, int num_asteroides,
+                   int num_planetas, double duracion_ejecucion, double duracion_media_iteracion,
+                   int n_threads);
 void gen_out_file(string out_file_path, vector<Asteroide> asteroides);
 void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
                    double duracion_ejecucion, double duracion_media_iteracion);
@@ -183,7 +184,7 @@ void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<P
     ofstream initconf;
     initconf.open (step_file_path, ios::out | ios::app | ios::binary);
     initconf << std::fixed;
-    initconf << std::setprecision(3);
+    initconf << std::setprecision(6);
 
     initconf << "*******ITERATION " << (iteration + 1) << "*******\n";
 
@@ -249,18 +250,19 @@ void gen_out_file(string out_file_path, vector<Asteroide> asteroides)
     Recibe el path para al archivo tests.txt y los vectores con la info de los ateroides.
     No devuelve nada.
 */
-void gen_test_file(string out_file_path, int num_iteraciones, int num_asteroides, int num_planetas,
-                   double duracion_ejecucion, double duracion_media_iteracion)
+void gen_test_file(string out_file_path, string type, int num_iteraciones, int num_asteroides,
+                   int num_planetas, double duracion_ejecucion, double duracion_media_iteracion,
+                   int n_threads)
 {
 
     /* Preparación para la escritura del archivo */
     ofstream initconf;
     initconf.open (out_file_path, ios::out | ios::app | ios::binary);
     initconf << std::fixed;
-    initconf << std::setprecision(3);
+    initconf << std::setprecision(9);
 
-    initconf << num_iteraciones << ", " <<  num_asteroides << ", " << num_planetas << ", " <<
-        duracion_ejecucion << ", " << duracion_media_iteracion << "\n";
+    initconf << type << ", " << num_iteraciones << ", " <<  num_asteroides << ", " << num_planetas <<
+    ", " << duracion_ejecucion << ", " << duracion_media_iteracion << ", " << n_threads << "\n";
 }
 
 

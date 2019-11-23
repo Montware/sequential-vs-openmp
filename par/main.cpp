@@ -47,7 +47,7 @@ int main(int argc, char const *argv[])
 
     /* Configuración para procesamientos en paralelo */
     omp_set_nested(1);
-    int n_threads = omp_get_max_threads();
+    int n_threads = omp_get_max_threads() - 1;
     cout << "Numero maximo de nucleos = " << n_threads << endl;     // TODO: Comentar
 
     //cout << "Ejecutando nasteroides-par optimizado" << endl;
@@ -137,8 +137,8 @@ int main(int argc, char const *argv[])
     cout << "Tiempo total de ejecucion = " << duracion_ejecucion.count() << " segundos" << endl;
 
     /* Almacenamiento de tiempos para los tests de evaluación con métrica */
-    gen_test_file(TESTFILE, num_iteraciones, num_asteroides, num_planetas,
-                  duracion_ejecucion.count(), duracion_media_iteracion.count());
+    gen_test_file(TESTFILE, "par", num_iteraciones, num_asteroides, num_planetas,
+                  duracion_ejecucion.count(), duracion_media_iteracion.count(), n_threads);
     return 0;
 }
 
