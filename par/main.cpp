@@ -50,11 +50,8 @@ int main(int argc, char const *argv[])
     int n_threads = omp_get_max_threads();
     cout << "Numero maximo de nucleos = " << n_threads << endl;     // TODO: Comentar
 
-
     //cout << "Ejecutando nasteroides-par optimizado" << endl;
     //double t1 = omp_get_wtime();      // TODO: Sustituir chronos por omp_get_wtime
-
-
 
     /* Inicio del temportizador para métrica de tiempo del programa*/
     high_resolution_clock::time_point program_start_time = high_resolution_clock::now();
@@ -101,23 +98,28 @@ int main(int argc, char const *argv[])
 
             /* Paso 2 (cálculo del movimiento de asteroides) */
             /* Cálculo de fuerzas y movimientos y actualización de la info de asteroides en cada iteración */
+            //#pragma omp parallel for ordered num_threads(n_threads) firstprivate(planetas)    # TODO: Borrar
             for (int i = 0; i <= num_iteraciones - 1; ++i)
             {   
                 /* Cálculos de cada asteroide */
                 for (size_t j = 0; j <= asteroides.size() - 1; ++j)
                 {
-                    calc_distancias(asteroides[j], asteroides, planetas);
-                    calc_movs_normales(asteroides[j], asteroides, planetas);
-                    calc_fuerzas(asteroides[j], asteroides, planetas);
+                    //calc_distancias(asteroides[j], asteroides, planetas);
+                    calc_dists_asteroides(asteroides[j], asteroides);
+                    calc_dists_planetas(asteroides[j], planetas);
+                    calc_movs_norm_asteroides(asteroides[j], asteroides);
+                    calc_movs_norm_planetas(asteroides[j], planetas);
+                    calc_fuerzas_asteroides(asteroides[j], asteroides);
+                    calc_fuerzas_planetas(asteroides[j], planetas);
                     calc_mov_asteroide(asteroides[j]);
                     calc_rebote_pared(asteroides[j]);
                 }
 
                 calc_rebote_asteroides(asteroides);
-                gen_step_file(STEPSFILE, asteroides, planetas, i);
+                //gen_step_file(STEPSFILE, asteroides, planetas, i);
             }
 
-            // Acaba el programa imprimiendo el archivo de salida -- paso 3
+            /* Acaba el programa imprimiendo el archivo de salida -- paso 3 */
             gen_out_file(OUTFILE, asteroides);
         }
     }

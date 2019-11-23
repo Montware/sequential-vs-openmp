@@ -12,6 +12,7 @@ class Planeta {
         double pos_x, pos_y, masa;
 
     public:
+        Planeta(){}
         /* Constructor por defecto */
         Planeta(double pos_x, double pos_y, double masa){
             this -> pos_x = pos_x;
@@ -45,9 +46,10 @@ class Asteroide {
         double pos_x, pos_y, masa;
         vector <double> dist_asteroides;
         vector <double> dist_planetas;
-        vector <double> ang_influencia, pendiente;  // Ángulos del influencia y pendiente
+        vector <double> angs_influ_asteroides;  // Ángulos de influencia con otros asteroides
+        vector <double> angs_influ_planetas;  // Ángulos de influencia con los planetas
         double ang_movimiento;       // Ángulo del movimiento
-        vector<double> fuerzas_x, fuerzas_y;        // Fuerzas de atracción
+        vector<double> fuerzas_x_asteroides, fuerzas_y_asteroides, fuerzas_x_planetas, fuerzas_y_planetas;        // Fuerzas de atracción
         double fuerza_x_tot, fuerza_y_tot;        // Fuerzas totales influyentes
         double acel_x, acel_y;      // Aceleraciones
         double vel_x, vel_y;      // Velocidades
@@ -93,21 +95,29 @@ class Asteroide {
             return this -> dist_planetas;
         };
 
-        vector<double> get_fuerzas_x(){
-            return this -> fuerzas_x;
-        };
-        
-        vector<double> get_fuerzas_y(){
-            return this -> fuerzas_y;
-        };
-   
-        vector<double> get_ang_influencia(){
-            return this -> ang_influencia;
+        vector<double> get_fuerzas_x_asteroides(){
+            return this -> fuerzas_x_asteroides;
         };
 
-        vector<double> get_pendiente(){
-            return this -> pendiente;
-        }; 
+        vector<double> get_fuerzas_y_asteroides(){
+            return this -> fuerzas_y_asteroides;
+        };
+
+        vector<double> get_fuerzas_x_planetas(){
+            return this -> fuerzas_x_planetas;
+        };
+
+        vector<double> get_fuerzas_y_planetas(){
+            return this -> fuerzas_y_planetas;
+        };
+   
+        vector<double> get_angs_influ_asteroides(){
+            return this -> angs_influ_asteroides;
+        };
+
+        vector<double> get_angs_influ_planetas(){
+            return this -> angs_influ_planetas;
+        };
 
         double get_acel_x(){
             return this -> acel_x;
@@ -176,38 +186,63 @@ class Asteroide {
         };
      
         /* Vacía el vector de movimientos normales incluyendo el ángulo de influencia */
-        void clear_movs_normales(){
-            this -> pendiente.clear();
-            this -> ang_influencia.clear();
+        void clear_movs_norm_asteroides(){
+            this -> angs_influ_asteroides.clear();
         };
 
-        /* Añade la componente X de una fuerza influyente sobre un asteroide */
-        void add_fuerza_x(double fuerzas_x){
-            this -> fuerzas_x.push_back(fuerzas_x);
+        /* Vacía el vector de movimientos normales incluyendo el ángulo de influencia */
+        void clear_movs_norm_planetas(){
+            this -> angs_influ_planetas.clear();
         };
 
-        /* Vacía el vector de componentes X de fuerzas influyentes en el asteroide */
-        void clear_fuerzas_x(){
-            this -> fuerzas_x.clear();
+        /* Añade la componente X de una fuerza influyente sobre un asteroide por parte de otros asteroides */
+        void add_fuerza_x_asteroides(double fuerzas_x){
+            this -> fuerzas_x_asteroides.push_back(fuerzas_x);
         };
 
-        /* Añade la componente Y de una fuerza influyente sobre un asteroide */
-        void add_fuerza_y(double fuerzas_y){
-            this -> fuerzas_y.push_back(fuerzas_y);
+        /* Añade la componente Y de una fuerza influyente sobre un asteroide por parte de otros asteroides */
+        void add_fuerza_y_asteroides(double fuerzas_y){
+            this -> fuerzas_y_asteroides.push_back(fuerzas_y);
         };
 
-        /* Vacía el vector de componentes Y de fuerzas influyentes en el asteroide */
-        void clear_fuerzas_y(){
-            this -> fuerzas_y.clear();
+        /* Añade la componente X de una fuerza influyente sobre un asteroide por parte de los planetas */
+        void add_fuerza_x_planetas(double fuerzas_x){
+            this -> fuerzas_x_planetas.push_back(fuerzas_x);
         };
 
-        /* Añade un ángulo de influencia sobre un asteroide */
-        void add_ang_influencia(double ang_ingluencia){
-            this -> ang_influencia.push_back(ang_ingluencia);
+        /* Añade la componente Y de una fuerza influyente sobre un asteroide por parte de los planetas */
+        void add_fuerza_y_planetas(double fuerzas_y){
+            this -> fuerzas_y_planetas.push_back(fuerzas_y);
         };
 
-        /* Añade una pendiente del ángulo de influencia sobre un asteroide */
-        void add_pendiente(double pendiente){
-            this -> pendiente.push_back(pendiente);
+        /* Vacía el vector de componentes X de fuerzas influyentes en el asteroide por parte de otros asteroides */
+        void clear_fuerzas_x_asteroides(){
+            this -> fuerzas_x_asteroides.clear();
         };
+
+        /* Vacía el vector de componentes Y de fuerzas influyentes en el asteroide por parte de otros asteroides */
+        void clear_fuerzas_y_asteroides(){
+            this -> fuerzas_y_asteroides.clear();
+        };
+
+        /* Vacía el vector de componentes X de fuerzas influyentes en el asteroide por parte de los planetas */
+        void clear_fuerzas_x_planetas(){
+            this -> fuerzas_x_planetas.clear();
+        };
+
+        /* Vacía el vector de componentes Y de fuerzas influyentes en el asteroide por parte de los planetas */
+        void clear_fuerzas_y_planetas(){
+            this -> fuerzas_y_planetas.clear();
+        };
+
+        /* Añade un ángulo de influencia sobre un asteroide respecto a otro asteroide */
+        void add_ang_influ_asteroides(double ang_ingluencia){
+            this -> angs_influ_asteroides.push_back(ang_ingluencia);
+        };
+
+        /* Añade un ángulo de influencia sobre un asteroide respecto a un planeta*/
+        void add_ang_influ_planetas(double ang_ingluencia){
+            this -> angs_influ_planetas.push_back(ang_ingluencia);
+        };
+
 };

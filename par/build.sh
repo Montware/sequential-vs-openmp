@@ -26,4 +26,4 @@ g++ main.cpp -o nasteroids-par -std=c++14 -O3 -DNDEBUG -Wall -fopenmp -Wextra -W
 #cg_annotate vgrind_seq_out --auto=yes
 
 # Ejecutando programa
-./nasteroids-par 5 2 1 2000
+./nasteroids-par 5 2 5 2000
