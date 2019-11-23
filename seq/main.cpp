@@ -98,17 +98,19 @@ int main(int argc, char const *argv[])
                     //calc_distancias(asteroides[j], asteroides, planetas);
                     calc_dists_asteroides(asteroides[j], asteroides);
                     calc_dists_planetas(asteroides[j], planetas);
-                    calc_movs_normales(asteroides[j], asteroides, planetas);
-                    calc_fuerzas(asteroides[j], asteroides, planetas);
+                    calc_movs_norm_asteroides(asteroides[j], asteroides);
+                    calc_movs_norm_planetas(asteroides[j], planetas);
+                    calc_fuerzas_asteroides(asteroides[j], asteroides);
+                    calc_fuerzas_planetas(asteroides[j], planetas);
                     calc_mov_asteroide(asteroides[j]);
                     calc_rebote_pared(asteroides[j]);
                 }
 
                 calc_rebote_asteroides(asteroides);
-                gen_step_file(STEPSFILE, asteroides, planetas, i);
+                //gen_step_file(STEPSFILE, asteroides, planetas, i);
             }
 
-            // Acaba el programa imprimiendo el archivo de salida -- paso 3
+            /* Acaba el programa imprimiendo el archivo de salida -- paso 3 */
             gen_out_file(OUTFILE, asteroides);
         }
     }
