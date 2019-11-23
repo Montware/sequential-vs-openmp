@@ -616,22 +616,31 @@ void calc_rebote_asteroides(vector<Asteroide> asteroides)
 
     /* TODO: Revisar cálculo */
     /* Cálculo de intercambio de velocidades de los asteroides si estos rebotan (dist <= DISTMIN) */
-    for(size_t i = 0; i <= asteroides.size() - 1; ++i)
+    for(size_t i = 0; i <= asteroides_temp_copy.size() - 1; ++i)
     {
-        for(size_t j = 0; j <= asteroides_temp_copy.size() - 1; ++j)
+        vector <double> dist_asteroides_copy = asteroides_temp_copy[i].get_dist_asteroides();
+        double pos_x_asteroid_copy = asteroides_temp_copy[i].get_pos_x();
+        double pos_y_asteroid_copy = asteroides_temp_copy[i].get_pos_y();
+        double vel_x_asteroid_copy = asteroides_temp_copy[i].get_vel_x();
+        double vel_y_asteroid_copy = asteroides_temp_copy[i].get_vel_y();
+
+        for(size_t j = 0; j <= asteroides.size() - 1; ++j)
         {
+            double pos_x_asteroid = asteroides[j].get_pos_x();
+            double pos_y_asteroid = asteroides[j].get_pos_y();
+            
             /* Comprueba que la distancia es menor a la mínima y que no está comparando el asteroide consigo mismo */
-            if(asteroides_temp_copy[i].get_dist_asteroides().at(j) < DISTMIN &&
-               asteroides[i].get_pos_x() != asteroides_temp_copy[j].get_pos_x() &&
-               asteroides[i].get_pos_y() != asteroides_temp_copy[j].get_pos_y())
+            if(dist_asteroides_copy.at(j) < DISTMIN &&
+               pos_x_asteroid != pos_x_asteroid_copy &&
+               pos_y_asteroid != pos_y_asteroid_copy)
                {
-                cout << "REBOTE ENTRE ASTEROIDES " << i << " con pos " << asteroides[i].get_pos_x() <<
-                ", " << asteroides[i].get_pos_y() << " y " << j << " con pos " <<
-                asteroides_temp_copy[j].get_pos_x() << ", " << asteroides_temp_copy[j].get_pos_y() << endl;
+                cout << "REBOTE ENTRE ASTEROIDES " << j << " con pos " << pos_x_asteroid <<
+                ", " << pos_y_asteroid << " y " << i << " con pos " <<
+                pos_x_asteroid << ", " << pos_y_asteroid << endl;
 
                 /* Intercambio de velocidades*/
-                asteroides[i].set_vel_x(-1 * asteroides_temp_copy[j].get_vel_x());
-                asteroides[i].set_vel_y(-1 * asteroides_temp_copy[j].get_vel_y());
+                asteroides[j].set_vel_x(-1 * vel_x_asteroid_copy);
+                asteroides[j].set_vel_y(-1 * vel_y_asteroid_copy);
             }
         }
     }
