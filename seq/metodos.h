@@ -22,6 +22,7 @@ using namespace std::chrono;
 
 /* Predeclaración de funciones */
 vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem);
+vector<Planeta> init_planetas(unsigned int num_asteroides, unsigned int val_sem);
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
                    unsigned int num_planetas, unsigned int semilla);
@@ -616,7 +617,6 @@ void calc_rebote_asteroides(vector<Asteroide> asteroides)
         asteroides_temp_copy.push_back(*asteroide_temp);
     }
 
-    /* TODO: Revisar cálculo */
     /* Cálculo de intercambio de velocidades de los asteroides si estos rebotan (dist <= DISTMIN) */
     for(size_t i = 0; i <= asteroides_temp_copy.size() - 1; ++i)
     {

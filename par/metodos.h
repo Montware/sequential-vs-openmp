@@ -22,6 +22,7 @@ using namespace std::chrono;
 
 /* Predeclaración de funciones */
 vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem);
+vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem);
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
                    unsigned int num_planetas, unsigned int semilla);
@@ -65,12 +66,16 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_
 
     default_random_engine semilla{val_sem};
 
+    /* Paralelización 1A */
+    //#pragma omp parallel for ordered num_threads(n_threads)             
     for(unsigned int i = 0; i <= num_asteroides - 1; ++i)
     {
         pos_x = xdist(semilla);
         pos_y = ydist(semilla);
         masa = mdist(semilla);
         Asteroide asteroide(pos_x, pos_y, masa);
+        /* Control de paralelización: Se guardan los objetos en en el vector de forma ordenada */
+        //#pragma omp ordered
         asteroides_vect.push_back(asteroide); 
     }
 
@@ -89,28 +94,24 @@ vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
     
     default_random_engine semilla{val_sem};
 
+    /* Paralelización 2A */
+    //#pragma omp parallel for ordered num_threads(n_threads)  
     for(unsigned int i = 0;i <= num_planetas - 1; ++i)
     {
         /* Colocación de los planetas en los laterales del marco de forma uniformemente distribuida */
-        if(i % 4 == 0)
+        if (i % 4 == 0)
         {
             pos_x = 0.0;
             pos_y = ydist(semilla);
-        }
-
-        if(i % 4 == 1)
+        } else if (i % 4 == 1)
         {
             pos_x = xdist(semilla);
             pos_y = 0.0;
-        }
-
-        if(i % 4 == 2)
+        } else if (i % 4 == 2)
         {
             pos_x = ANCHURA;
             pos_y = ydist(semilla);
-        }
-
-        if(i % 4 == 3)
+        } else if(i % 4 == 3)
         {
             pos_x = xdist(semilla);
             pos_y = ALTURA;
@@ -120,6 +121,8 @@ vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
         masa = mdist(semilla) * 10;
 
         Planeta planeta(pos_x, pos_y, masa);
+        /* Control de paralelización: Se guardan los objetos en en el vector de forma ordenada */
+        //#pragma omp ordered
         planetas_vect.push_back(planeta);
     }
 
@@ -152,16 +155,26 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
     initconf << num_asteroides << " " <<  num_iteraciones << " " <<  num_planetas << " " <<  semilla << "\n";
 
     /* Escritura de info de los asteroides */
+    /* Paralelización 1A */
+    //#pragma omp parallel for ordered num_threads(n_threads)  
     for(size_t i = 0; i <= asteroides.size() - 1; ++i)
     {
         asteroide = asteroides.at(i);
+        
+        /* Control de paralelización: Se guardan los objetos en en el vector de forma ordenada */
+        //#pragma omp ordered
         initconf << asteroide.get_pos_x() << " " <<  asteroide.get_pos_y() << " " <<  asteroide.get_masa() << "\n";
     }
 
     /* Escritura de info de los planetas */
+    /* Paralelización 1A */
+    //#pragma omp parallel for ordered num_threads(n_threads)  
     for(size_t j = 0; j <= planetas.size() - 1; ++j)
     {
         planeta = planetas.at(j);
+
+        /* Control de paralelización: Se guardan los objetos en en el vector de forma ordenada */
+        //#pragma omp ordered
         initconf << planeta.get_pos_x() << " " <<  planeta.get_pos_y() << " " <<  planeta.get_masa() << "\n";
     }
 
@@ -175,6 +188,7 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
     planetas, y los parámetros de ejecución del programa.
     No devuelve nada.
 */
+// TODO: Paralelizar    // TODO:Seguir por aqui, revisar los anteriores al final
 void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int iteration)
 {
@@ -616,7 +630,6 @@ void calc_rebote_asteroides(vector<Asteroide> asteroides)
         asteroides_temp_copy.push_back(*asteroide_temp);
     }
 
-    /* TODO: Revisar cálculo */
     /* Cálculo de intercambio de velocidades de los asteroides si estos rebotan (dist <= DISTMIN) */
     for(size_t i = 0; i <= asteroides_temp_copy.size() - 1; ++i)
     {

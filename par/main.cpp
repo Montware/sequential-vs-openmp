@@ -98,7 +98,7 @@ int main(int argc, char const *argv[])
 
             /* Paso 2 (cálculo del movimiento de asteroides) */
             /* Cálculo de fuerzas y movimientos y actualización de la info de asteroides en cada iteración */
-            //#pragma omp parallel for ordered num_threads(n_threads) firstprivate(planetas)    # TODO: Borrar
+            //#pragma omp parallel for ordered num_threads(n_threads) firstprivate(planetas)    // TODO: Borrar
             for (int i = 0; i <= num_iteraciones - 1; ++i)
             {   
                 /* Cálculos de cada asteroide */
