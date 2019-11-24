@@ -21,8 +21,8 @@ using namespace std;
 using namespace std::chrono;
 
 /* Predeclaración de funciones */
-vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem);
-vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem);
+vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_engine& semilla_re);
+vector<Planeta> init_planetas(unsigned int num_planetas, default_random_engine& semilla_re);
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
                    unsigned int num_planetas, unsigned int semilla);
@@ -42,6 +42,7 @@ void calc_mov_asteroide(Asteroide& asteroide);
 void calc_rebote_pared(Asteroide& asteroide);
 void calc_rebote_asteroides(vector<Asteroide> asteroides);
 Asteroide* clonar_asteroide(const Asteroide& orig);
+default_random_engine gen_aleatorios(int semilla);
 
 /* Funciones para generacion automática de valores (en base a una distribución y desviación)
 de posicion (coordenadas X e Y) dentro de las dimensiones (200x200) del escenario de simulación.
@@ -59,20 +60,18 @@ normal_distribution<double> mdist(MEDIADISTRIBUCIONMASAS, DESVIACIONSDM);
     Recibe el número de asteroides introducidos y el valor de la semilla para la inicialización aleatoria.
     Devuelve un vector de asteroides con las posiciones X e Y y las masas ya definidas.
  */
-vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_sem)
+vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_engine& semilla_re)
 {
     vector<Asteroide> asteroides_vect;
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
-
-    default_random_engine semilla{val_sem};
 
     /* Paralelización 1A */
     //#pragma omp parallel for ordered num_threads(n_threads)             
     for(unsigned int i = 0; i <= num_asteroides - 1; ++i)
     {
-        pos_x = xdist(semilla);
-        pos_y = ydist(semilla);
-        masa = mdist(semilla);
+        pos_x = xdist(semilla_re);
+        pos_y = ydist(semilla_re);
+        masa = mdist(semilla_re);
         Asteroide asteroide(pos_x, pos_y, masa);
         /* Control de paralelización: Se guardan los objetos en en el vector de forma ordenada */
         //#pragma omp ordered
@@ -87,12 +86,11 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, unsigned int val_
     Recibe el número de planetas introducidos y el valor de la semilla para la inicialización aleatoria.
     Devuelve un vector de planetas con las posiciones X e Y y las masas ya definidas.
 */
-vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
+vector<Planeta> init_planetas(unsigned int num_planetas, default_random_engine& semilla_re)
 {
     vector<Planeta> planetas_vect;
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
     
-    default_random_engine semilla{val_sem};
 
     /* Paralelización 2A */
     //#pragma omp parallel for ordered num_threads(n_threads)  
@@ -102,23 +100,23 @@ vector<Planeta> init_planetas(unsigned int num_planetas, unsigned int val_sem)
         if (i % 4 == 0)
         {
             pos_x = 0.0;
-            pos_y = ydist(semilla);
+            pos_y = ydist(semilla_re);
         } else if (i % 4 == 1)
         {
-            pos_x = xdist(semilla);
+            pos_x = xdist(semilla_re);
             pos_y = 0.0;
         } else if (i % 4 == 2)
         {
             pos_x = ANCHURA;
-            pos_y = ydist(semilla);
+            pos_y = ydist(semilla_re);
         } else if(i % 4 == 3)
         {
-            pos_x = xdist(semilla);
+            pos_x = xdist(semilla_re);
             pos_y = ALTURA;
         }
 
         /* Mayoración x10 de la masa de los planetas */
-        masa = mdist(semilla) * 10;
+        masa = mdist(semilla_re) * 10;
 
         Planeta planeta(pos_x, pos_y, masa);
         /* Control de paralelización: Se guardan los objetos en en el vector de forma ordenada */
@@ -676,4 +674,14 @@ Asteroide* clonar_asteroide(const Asteroide& orig)
 }
 
 
+/* Función de generación del motor de aleatorios.
+    Recibe la semilla con la que generar los aleatorios.
+    Devuelve semilla de tipo default_random_engine.
+*/
+default_random_engine gen_aleatorios(int semilla)
+{
+    default_random_engine semilla_re{semilla};
+
+    return semilla_re;
+}
 

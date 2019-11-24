@@ -77,10 +77,14 @@ int main(int argc, char const *argv[])
             print_program_info(num_asteroides, num_iteraciones, INITFILE, OUTFILE, num_planetas,
                                semilla, GRAVITY, PERIODO, DISTMIN, ANCHURA, ALTURA);
             
+                        /* Generación de semilla aleatoria de tipo default_random_engine*/
+            
+            default_random_engine semilla_re = gen_aleatorios(semilla); 
+            
             /* Paso 1 (inicial) */
             /* Preparación de los vectores de objetos para el programa y generaciónd e datos y archivo init_config.txt */
-            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla);
-            vector<Planeta> planetas = init_planetas(num_planetas, semilla);
+            vector<Asteroide> asteroides = init_asteroides(num_asteroides, semilla_re);
+            vector<Planeta> planetas = init_planetas(num_planetas, semilla_re);
             gen_init_file(INITFILE, asteroides, planetas, num_asteroides, num_iteraciones, num_planetas, semilla);
             vector<double> velocidades_finales_x;
             vector<double> velocidades_finales_y;

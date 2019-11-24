@@ -24,4 +24,4 @@ g++ main.cpp -o nasteroids-seq-no-opti -std=c++14 -Wall -Wextra -Wno-deprecated 
 #cg_annotate vgrind_seq_out --auto=yes
 
 # Ejecutando programa
-./nasteroids-seq-no-opti 5 2 1 2000
+./nasteroids-seq-no-opti 5 2 5 2000

@@ -22,7 +22,7 @@ using namespace std::chrono;
 
 /* Predeclaración de funciones */
 vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_engine& semilla_re);
-vector<Planeta> init_planetas(unsigned int num_asteroides, default_random_engine& semilla_re);
+vector<Planeta> init_planetas(unsigned int num_planetas, default_random_engine& semilla_re);
 void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int num_asteroides, unsigned int num_iteraciones,
                    unsigned int num_planetas, unsigned int semilla);
@@ -65,8 +65,6 @@ vector<Asteroide> init_asteroides(unsigned int num_asteroides, default_random_en
     vector<Asteroide> asteroides_vect;
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
 
-    // default_random_engine semilla{val_sem};
-
     for(unsigned int i = 0; i <= num_asteroides - 1; ++i)
     {
         pos_x = xdist(semilla_re);
@@ -89,8 +87,6 @@ vector<Planeta> init_planetas(unsigned int num_planetas, default_random_engine& 
     vector<Planeta> planetas_vect;
     double pos_x = 0.0, pos_y = 0.0, masa = 0.0;
     
-    // default_random_engine semilla{val_sem};
-
     for(unsigned int i = 0;i <= num_planetas - 1; ++i)
     {
         /* Colocación de los planetas en los laterales del marco de forma uniformemente distribuida */
