@@ -7,7 +7,7 @@
 # numPlanetas = 8;
 # semilla = 100;
 
-ulimit -s unlimited
+#ulimit -s unlimited
 #KMP_STACKSIZE = 1m ./nasteroids-par        // TODO: Ver si necesario
 
 if [ -f "nasteroids-par" ]; then
@@ -26,4 +26,4 @@ g++ main.cpp -o nasteroids-par -std=c++14 -O3 -DNDEBUG -Wall -fopenmp -Wextra -W
 #cg_annotate vgrind_seq_out --auto=yes
 
 # Ejecutando programa
-./nasteroids-par 5 2 5 2000
+./nasteroids-par 100 50 50 2000

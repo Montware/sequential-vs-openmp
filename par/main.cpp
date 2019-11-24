@@ -108,18 +108,18 @@ int main(int argc, char const *argv[])
                 for (size_t j = 0; j <= asteroides.size() - 1; ++j)
                 {
                     //calc_distancias(asteroides[j], asteroides, planetas);
-                    calc_dists_asteroides(asteroides[j], asteroides);
-                    calc_dists_planetas(asteroides[j], planetas);
-                    calc_movs_norm_asteroides(asteroides[j], asteroides);
-                    calc_movs_norm_planetas(asteroides[j], planetas);
-                    calc_fuerzas_asteroides(asteroides[j], asteroides);
-                    calc_fuerzas_planetas(asteroides[j], planetas);
-                    calc_mov_asteroide(asteroides[j]);
+                    calc_dists_asteroides(asteroides[j], asteroides, n_threads);
+                    calc_dists_planetas(asteroides[j], planetas, n_threads);
+                    calc_movs_norm_asteroides(asteroides[j], asteroides, n_threads);
+                    calc_movs_norm_planetas(asteroides[j], planetas, n_threads);
+                    calc_fuerzas_asteroides(asteroides[j], asteroides, n_threads);
+                    calc_fuerzas_planetas(asteroides[j], planetas, n_threads);
+                    calc_mov_asteroide(asteroides[j], n_threads);
                     calc_rebote_pared(asteroides[j]);
                 }
 
-                calc_rebote_asteroides(asteroides);
-                //gen_step_file(STEPSFILE, asteroides, planetas, i);
+                calc_rebote_asteroides(asteroides, n_threads);
+                gen_step_file(STEPSFILE, asteroides, planetas, i);
             }
 
             /* Acaba el programa imprimiendo el archivo de salida -- paso 3 */

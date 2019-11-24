@@ -32,15 +32,15 @@ void gen_out_file(string out_file_path, vector<Asteroide> asteroides);
 void gen_test_file(string out_file_path, string type, int num_iteraciones, int num_asteroides,
                    int num_planetas, double duracion_ejecucion, double duracion_media_iteracion,
                    int n_threads);
-void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides);
-void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas);
-void calc_movs_norm_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides);
-void calc_movs_norm_planetas(Asteroide& asteroide, vector<Planeta> planetas);
-void calc_fuerzas_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides);
-void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas);
-void calc_mov_asteroide(Asteroide& asteroide);
+void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides, int n_threads);
+void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas, int n_threads);
+void calc_movs_norm_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides, int n_threads);
+void calc_movs_norm_planetas(Asteroide& asteroide, vector<Planeta> planetas, int n_threads);
+void calc_fuerzas_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides, int n_threads);
+void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas, int n_threads);
+void calc_mov_asteroide(Asteroide& asteroide, int n_threads);
 void calc_rebote_pared(Asteroide& asteroide);
-void calc_rebote_asteroides(vector<Asteroide> asteroides);
+void calc_rebote_asteroides(vector<Asteroide> asteroides, int n_threads);
 Asteroide* clonar_asteroide(const Asteroide& orig);
 default_random_engine gen_aleatorios(int semilla);
 
@@ -186,7 +186,7 @@ void gen_init_file(string init_file_path, vector<Asteroide> asteroides, vector<P
     planetas, y los parámetros de ejecución del programa.
     No devuelve nada.
 */
-// TODO: Paralelizar    // TODO:Seguir por aqui, revisar los anteriores al final
+// TODO: Paralelizar (antes de ntregar, en la ejecucion se comentara esta funcion para evitar su ejecucion no necesaria)    // Revisar tambien los anteriores
 void gen_step_file(string step_file_path, vector<Asteroide> asteroides, vector<Planeta> planetas,
                    unsigned int iteration)
 {
@@ -282,7 +282,7 @@ void gen_test_file(string out_file_path, string type, int num_iteraciones, int n
     Recibe el asteroide a evaluar, un vector con todos los asteroides.
     No devuelve nada.
 */
-void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
+void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides, int n_threads)
 {
     Asteroide asteroide_tmp; 
 
@@ -290,11 +290,15 @@ void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
     asteroide.clear_dists_asteroides();
 
     /* Cálculo de la distancia con los demás asteroides */
+    /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads) private(asteroide_tmp)
     for(size_t i = 0; i <= asteroides.size() - 1; ++i)
     {
         asteroide_tmp = asteroides[i];
         double dist = sqrt(pow((asteroide.get_pos_x() - asteroide_tmp.get_pos_x()), 2) +
                            pow((asteroide.get_pos_y() - asteroide_tmp.get_pos_y()), 2));
+        
+        #pragma omp ordered
         asteroide.add_dist_asteroides(dist);
     }
 
@@ -304,7 +308,7 @@ void calc_dists_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
     Recibe el asteroide a evaluar, un vector con los planetas.
     No devuelve nada.
 */
-void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas)
+void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas, int n_threads)
 {
     Planeta planeta_temp;
 
@@ -312,11 +316,15 @@ void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas)
     asteroide.clear_dists_planetas();
 
     /* Cálculo de la distancia con los demás planetas */
+    /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads) private(planeta_temp)
     for(size_t j = 0; j <= planetas.size() - 1; ++j)
     {
         planeta_temp = planetas[j];
         double dist = sqrt(pow((asteroide.get_pos_x() - planeta_temp.get_pos_x()), 2) +
                            pow((asteroide.get_pos_y() - planeta_temp.get_pos_y()), 2));
+
+        #pragma omp ordered
         asteroide.add_dist_planetas(dist);
     }
 }
@@ -326,7 +334,7 @@ void calc_dists_planetas(Asteroide& asteroide, vector<Planeta> planetas)
     Recibe el asteroide a evaluar, un vector con todos los asteroides.
     No devuelve nada.
 */
-void calc_movs_norm_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
+void calc_movs_norm_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides, int n_threads)
 {
     vector <double> dist_asteroides = asteroide.get_dist_asteroides();
     double  pos_x_asteroides = asteroide.get_pos_x();
@@ -335,6 +343,8 @@ void calc_movs_norm_asteroides(Asteroide& asteroide, vector<Asteroide> asteroide
     /* Reset de movimientos normales tanto respecto a asteroides */
     asteroide.clear_movs_norm_asteroides();
     /* Cálculo del movimiento normal provocado en un asteroide por los demás */
+    /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads)
     for(size_t i = 0; i <= asteroides.size() - 1; ++i)
     {
         double  pos_x_asteroide = asteroides[i].get_pos_x();
@@ -361,7 +371,10 @@ void calc_movs_norm_asteroides(Asteroide& asteroide, vector<Asteroide> asteroide
             }
 
             /* Cálculo del ángulo con la arcotangente */
-            asteroide.add_ang_influ_asteroides(atan(pendiente_gen));
+            double ang_influ = atan(pendiente_gen);
+
+            #pragma omp ordered
+            asteroide.add_ang_influ_asteroides(ang_influ);
         }
     }
 }
@@ -371,7 +384,7 @@ void calc_movs_norm_asteroides(Asteroide& asteroide, vector<Asteroide> asteroide
     Recibe el asteroide a evaluar, un vector con los planetas.
     No devuelve nada.
 */
-void calc_movs_norm_planetas(Asteroide& asteroide, vector<Planeta> planetas)
+void calc_movs_norm_planetas(Asteroide& asteroide, vector<Planeta> planetas, int n_threads)
 {
     double  pos_x_planetas = asteroide.get_pos_x();
     double  pos_y_planetas = asteroide.get_pos_y();
@@ -379,14 +392,15 @@ void calc_movs_norm_planetas(Asteroide& asteroide, vector<Planeta> planetas)
     /* Reset de movimientos normales tanto respecto a asteroides */
     asteroide.clear_movs_norm_planetas();
     /* Cálculo del movimiento normal provocado en un asteroide por los planetas */
+    /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads)
     for(size_t j = 0; j <= planetas.size() - 1; ++j)
-{
+    {
         double  pos_x_planeta = planetas[j].get_pos_x();
         double  pos_y_planeta = planetas[j].get_pos_y();
 
         /* Cálculo de pendiente */
-        double pendiente_gen = (pos_y_planetas - pos_y_planeta) /
-        (pos_x_planetas - pos_x_planeta);
+        double pendiente_gen = (pos_y_planetas - pos_y_planeta) / (pos_x_planetas - pos_x_planeta);
         
         /* Correción antes de almacenar */
         if (pendiente_gen > 1)
@@ -403,8 +417,12 @@ void calc_movs_norm_planetas(Asteroide& asteroide, vector<Planeta> planetas)
             pendiente_gen = 0.0;
         }
 
+
         /* Cálculo del ángulo con la arcotangente */
-        asteroide.add_ang_influ_planetas(atan(pendiente_gen));
+        double ang_influ = atan(pendiente_gen);
+        
+        #pragma omp ordered
+        asteroide.add_ang_influ_planetas(ang_influ);
     }
 }
 
@@ -413,7 +431,7 @@ void calc_movs_norm_planetas(Asteroide& asteroide, vector<Planeta> planetas)
     Recibe el asteroide a evaluar, un vector con todos los asteroides.
     No devuelve nada.
 */
-void calc_fuerzas_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
+void calc_fuerzas_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides, int n_threads)
 {
     /* Obtención de distancias */    
     vector<double> dists_asteroides = asteroide.get_dist_asteroides();
@@ -427,6 +445,8 @@ void calc_fuerzas_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
     asteroide.clear_fuerzas_y_asteroides();
 
     /* Cálculo de componentes de la fuerza de atracción sobre un asteroide ejercida por los demás */
+    /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads) private(fuerza_x, fuerza_y)
     for(size_t i = 0; i <= dists_asteroides.size() - 1; ++i)
     {
         /* Si el asteroide es él mismo o la distancia entre ellos es menor que 5 la fuerza es ignorada (nula) */
@@ -458,8 +478,11 @@ void calc_fuerzas_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
             fuerza_y = 100.0;
         }
 
-        asteroide.add_fuerza_x_asteroides(fuerza_x);
-        asteroide.add_fuerza_y_asteroides(fuerza_y);
+        # pragma omp ordered
+        {
+            asteroide.add_fuerza_x_asteroides(fuerza_x);
+            asteroide.add_fuerza_y_asteroides(fuerza_y);
+        }
     }
 }
 
@@ -467,7 +490,7 @@ void calc_fuerzas_asteroides(Asteroide& asteroide, vector<Asteroide> asteroides)
     Recibe el asteroide a evaluar con los planetas.
     No devuelve nada.
 */
-void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas)
+void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas, int n_threads)
 {
     /* Obtención de distancias */    
     vector<double> dists_planetas = asteroide.get_dist_planetas();
@@ -478,9 +501,11 @@ void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas)
     
     /* Reset de fuerzas */
     asteroide.clear_fuerzas_x_planetas();
-    asteroide.clear_fuerzas_x_planetas();
+    asteroide.clear_fuerzas_y_planetas();
  
     /* Cálculo de de componentes de la fuerza de atracción sobre un asteroide ejercida por los planetas */
+    /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads) private(fuerza_x, fuerza_y)
     for(size_t j = 0; j <= dists_planetas.size() - 1; ++j)
     {
         double masa_aster2 = planetas[j].get_masa();
@@ -506,8 +531,11 @@ void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas)
             fuerza_y = 100.0;
         }
 
-        asteroide.add_fuerza_x_planetas(fuerza_x);
-        asteroide.add_fuerza_y_planetas(fuerza_y);
+        # pragma omp ordered
+        {
+            asteroide.add_fuerza_x_planetas(fuerza_x);
+            asteroide.add_fuerza_y_planetas(fuerza_y);
+        }
     }
 }
 
@@ -516,7 +544,7 @@ void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas)
     Recibe el asteroide a evaluar.
     No devuelve nada.
 */
-void calc_mov_asteroide(Asteroide& asteroide)
+void calc_mov_asteroide(Asteroide& asteroide, int n_threads)
 {
     vector<double> fuerzas_x_asteroides = asteroide.get_fuerzas_x_asteroides();
     vector<double> fuerzas_y_asteroides = asteroide.get_fuerzas_y_asteroides();
@@ -524,55 +552,50 @@ void calc_mov_asteroide(Asteroide& asteroide)
     vector<double> fuerzas_y_planetas = asteroide.get_fuerzas_y_planetas();
     double masa = asteroide.get_masa();
 
-    /* Reset de fuerzas totales */
-    asteroide.set_fuerza_tot_x(0.0);
-    asteroide.set_fuerza_tot_y(0.0);
+    double fuerza_tot_x = 0.0;
+    double fuerza_tot_y = 0.0;
 
     /* Optimización B1: Fusión de bucles*/
     /* Sumatorio de las fuerzas totales X e Y optimizado */
+    /* Paralelización 1A */
+    #pragma omp parallel for num_threads(n_threads) reduction(+:fuerza_tot_x, fuerza_tot_y)
     for(size_t i = 0; i <= fuerzas_x_asteroides.size() - 1; ++i)
     {
-        asteroide.set_fuerza_tot_x(asteroide.get_fuerza_tot_x() + fuerzas_x_asteroides[i]);
-        asteroide.set_fuerza_tot_y(asteroide.get_fuerza_tot_y() + fuerzas_y_asteroides[i]);
+        fuerza_tot_x += fuerzas_x_asteroides[i];
+        fuerza_tot_y += fuerzas_y_asteroides[i];
     }
 
+    /* Paralelización 1A */
+    #pragma omp parallel for num_threads(n_threads) reduction(+:fuerza_tot_x, fuerza_tot_y)
     for(size_t j = 0; j <= fuerzas_x_planetas.size() - 1; ++j)
     {
-        asteroide.set_fuerza_tot_x(asteroide.get_fuerza_tot_x() + fuerzas_x_planetas[j]);
-        asteroide.set_fuerza_tot_y(asteroide.get_fuerza_tot_y() + fuerzas_y_planetas[j]);
-    }
+        fuerza_tot_x += fuerzas_x_planetas[j];
+        fuerza_tot_y += fuerzas_y_planetas[j];
+    }   
 
-    /* Cálculo de la aceleración */
-    /* Cálculo de la aceleración X*/
+    asteroide.set_fuerza_tot_x(fuerza_tot_x);
+    asteroide.set_fuerza_tot_y(fuerza_tot_y);
+
+    // TODO: Revisar reordenación de cálculos para paralelizar por un lado cálculos de componentes x y por otro lado componentes y
+    /* Cálculo de la aceleración, velocidad y nueva posición agrupados por tipo de coordenada */
+    /* Cálculo de componentes X */
     double acel_x = asteroide.get_fuerza_tot_x() / masa;
     asteroide.set_acel_x(acel_x);
-
-    /* Cálculo de la aceleración Y*/
-    double acel_y = asteroide.get_fuerza_tot_y() / masa;
-    asteroide.set_acel_y(acel_y);
-
-    /* Cálculo de la velocidad */
-    /* Cálculo de la velocidad X */
     double velx = asteroide.get_vel_x();
     velx = velx + acel_x * PERIODO;
-
-    /* Cálculo de la velocidad Y */
-    double vely = asteroide.get_vel_y();
-    vely = vely + acel_y * PERIODO;
-
     asteroide.set_vel_x(velx);
-    asteroide.set_vel_y(vely);
-
-    /* Cálculo de la posición */
-    /* Cálculo de la posición X */
     double pos_x = asteroide.get_pos_x();
     pos_x = pos_x + velx * PERIODO;
+    asteroide.set_pos_x(pos_x);
 
-    /* Cálculo de la posición Y */
+    /* Cálculo de componentes Y */
+    double acel_y = asteroide.get_fuerza_tot_y() / masa;
+    asteroide.set_acel_y(acel_y);
+    double vely = asteroide.get_vel_y();
+    vely = vely + acel_y * PERIODO;
+    asteroide.set_vel_y(vely);
     double pos_y = asteroide.get_pos_y();
     pos_y = pos_y + vely * PERIODO;
-
-    asteroide.set_pos_x(pos_x);
     asteroide.set_pos_y(pos_y);
 }
 
@@ -586,23 +609,30 @@ void calc_rebote_pared(Asteroide& asteroide)
     double pos_x = asteroide.get_pos_x();
     double pos_y = asteroide.get_pos_y();
 
+    // TODO: Ver si paralelizar cada comprobacion if
     /* Cuando un el asteroide está a menos de la distancia mínima de los bordes, sale rebotado
         cambiando el signo de su velocidad */
     if(pos_x <= 0)
     {
         asteroide.set_pos_x(DISTMIN);
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
-    } else if (pos_y <= 0)
+    }
+    
+    if (pos_y <= 0)
     {
         asteroide.set_pos_y(DISTMIN);
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
 
-    } else if (pos_x >= ANCHURA)
+    } 
+    
+    if (pos_x >= ANCHURA)
     {
         asteroide.set_pos_x(ANCHURA - DISTMIN);
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
 
-    } else if (pos_y >= ALTURA)
+    }
+    
+    if (pos_y >= ALTURA)
     {
         asteroide.set_pos_y(ALTURA - DISTMIN);
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
@@ -614,33 +644,49 @@ void calc_rebote_pared(Asteroide& asteroide)
     Recibe el vector de asteroides.
     No devuelve nada.
 */
-void calc_rebote_asteroides(vector<Asteroide> asteroides)
+void calc_rebote_asteroides(vector<Asteroide> asteroides, int n_threads)
 {
     /* Copia temporal de vector asteroides para no perder las velocidades antes de los cambios */
     vector<Asteroide> asteroides_temp_copy;  
     Asteroide* asteroide_orig;
     Asteroide* asteroide_temp;
 
+   /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads) private(asteroide_orig, asteroide_temp)
     for(size_t i = 0; i <= asteroides.size() - 1; ++i)
     {
         asteroide_orig = &asteroides[i];
-        asteroide_temp = clonar_asteroide(*asteroide_orig);        
+        asteroide_temp = clonar_asteroide(*asteroide_orig);
+
+        #pragma omp ordered        
         asteroides_temp_copy.push_back(*asteroide_temp);
     }
 
+    vector <double> dist_asteroides_copy;
+    double pos_x_asteroid_copy;
+    double pos_y_asteroid_copy;
+    double vel_x_asteroid_copy;
+    double vel_y_asteroid_copy;
+    double pos_x_asteroid;
+    double pos_y_asteroid;
+
     /* Cálculo de intercambio de velocidades de los asteroides si estos rebotan (dist <= DISTMIN) */
+    /* Paralelización 1A */
+    #pragma omp parallel for ordered num_threads(n_threads) private(dist_asteroides_copy, pos_x_asteroid_copy, pos_y_asteroid_copy, vel_x_asteroid_copy, vel_y_asteroid_copy)    
     for(size_t i = 0; i <= asteroides_temp_copy.size() - 1; ++i)
     {
-        vector <double> dist_asteroides_copy = asteroides_temp_copy[i].get_dist_asteroides();
-        double pos_x_asteroid_copy = asteroides_temp_copy[i].get_pos_x();
-        double pos_y_asteroid_copy = asteroides_temp_copy[i].get_pos_y();
-        double vel_x_asteroid_copy = asteroides_temp_copy[i].get_vel_x();
-        double vel_y_asteroid_copy = asteroides_temp_copy[i].get_vel_y();
+        dist_asteroides_copy = asteroides_temp_copy[i].get_dist_asteroides();
+        pos_x_asteroid_copy = asteroides_temp_copy[i].get_pos_x();
+        pos_y_asteroid_copy = asteroides_temp_copy[i].get_pos_y();
+        vel_x_asteroid_copy = asteroides_temp_copy[i].get_vel_x();
+        vel_y_asteroid_copy = asteroides_temp_copy[i].get_vel_y();
 
+        /* Paralelización 1A */
+        #pragma omp parallel for ordered num_threads(n_threads) private(pos_x_asteroid, pos_y_asteroid)    
         for(size_t j = 0; j <= asteroides.size() - 1; ++j)
         {
-            double pos_x_asteroid = asteroides[j].get_pos_x();
-            double pos_y_asteroid = asteroides[j].get_pos_y();
+            pos_x_asteroid = asteroides[j].get_pos_x();
+            pos_y_asteroid = asteroides[j].get_pos_y();
             
             /* Comprueba que la distancia es menor a la mínima y que no está comparando el asteroide consigo mismo */
             if(dist_asteroides_copy.at(j) < DISTMIN &&

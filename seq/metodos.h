@@ -464,7 +464,7 @@ void calc_fuerzas_planetas(Asteroide& asteroide, vector<Planeta> planetas)
     
     /* Reset de fuerzas */
     asteroide.clear_fuerzas_x_planetas();
-    asteroide.clear_fuerzas_x_planetas();
+    asteroide.clear_fuerzas_y_planetas();
  
     /* Cálculo de de componentes de la fuerza de atracción sobre un asteroide ejercida por los planetas */
     for(size_t j = 0; j <= dists_planetas.size() - 1; ++j)
@@ -578,17 +578,23 @@ void calc_rebote_pared(Asteroide& asteroide)
     {
         asteroide.set_pos_x(DISTMIN);
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
-    } else if (pos_y <= 0)
+    } 
+    
+    if (pos_y <= 0)
     {
         asteroide.set_pos_y(DISTMIN);
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
 
-    } else if (pos_x >= ANCHURA)
+    } 
+
+    if (pos_x >= ANCHURA)
     {
         asteroide.set_pos_x(ANCHURA - DISTMIN);
         asteroide.set_vel_x(asteroide.get_vel_x() * -1);
 
-    } else if (pos_y >= ALTURA)
+    } 
+    
+    if (pos_y >= ALTURA)
     {
         asteroide.set_pos_y(ALTURA - DISTMIN);
         asteroide.set_vel_y(asteroide.get_vel_y() * -1);
