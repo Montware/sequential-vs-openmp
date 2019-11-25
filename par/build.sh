@@ -26,7 +26,7 @@ g++ main.cpp -o nasteroids-par -std=c++14 -O3 -DNDEBUG -Wall -fopenmp -Wextra -W
 #cg_annotate vgrind_seq_out --auto=yes
 
 # Ejecutando programa
-./nasteroids-par 500 500 250 2000
+./nasteroids-par 125 100 60 2000
 
-printf "\nDiferencias entre out.txt seq y par = 0 / Irrelevantes\n"  
-diff out.txt ../seq/out.txt
+#printf "\nDiferencias entre out.txt seq y par = 0 / Irrelevantes\n"  
+#diff out.txt ../seq/out.txt

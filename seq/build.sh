@@ -23,4 +23,4 @@ g++ main.cpp -o nasteroids-seq -std=c++14 -O3 -DNDEBUG -Wall -Wextra -Wno-deprec
 #cg_annotate vgrind_seq_out --auto=yes
 
 # Ejecutando programa
-./nasteroids-seq 500 500 250 2000
+./nasteroids-seq 125 100 60 2000
